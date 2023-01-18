@@ -62,7 +62,19 @@ VOID SystemClass::InitializeWindows()
 
 VOID SystemClass::InitialWindowButtons()
 {
-
+	HWND btn = CreateWindow(
+		L"button",
+		L"다시하기",
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		555,
+		550,
+		100,
+		30,
+		m_hwnd,
+		(HMENU)IDC_BTN_START,
+		m_hinstance,
+		nullptr
+	);
 }
 
 VOID SystemClass::Run()

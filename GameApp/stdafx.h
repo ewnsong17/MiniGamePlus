@@ -17,5 +17,12 @@
 #include <memory.h>
 #include <tchar.h>
 
+//constexpr 변수도 여기다 선언해보겠습니당.
+constexpr int IDC_BTN_START = 1003;
+constexpr int IDC_BTN_END = 1004;
+constexpr int IDC_TEXT_WORD = 1005;
+constexpr int IDC_BTN_ENTER = 1006;
+constexpr int IDC_UPDATE_WORD = 1007;
+
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.
