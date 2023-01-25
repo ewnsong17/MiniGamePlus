@@ -24,5 +24,9 @@ constexpr int IDC_TEXT_WORD = 1005;
 constexpr int IDC_BTN_ENTER = 1006;
 constexpr int IDC_UPDATE_WORD = 1007;
 
+//해상도 사이즈 입니다.
+constexpr int SCREEN_WIDTH = 1024;
+constexpr int SCREEN_HEIGHT = 768;
+
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.

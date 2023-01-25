@@ -47,8 +47,8 @@ VOID SystemClass::InitializeWindows()
 		WS_SYSMENU | WS_OVERLAPPED,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		screenWidth,
-		screenHeight,
+		SCREEN_WIDTH,
+		SCREEN_HEIGHT,
 		nullptr,
 		nullptr,
 		m_hinstance,
@@ -56,22 +56,35 @@ VOID SystemClass::InitializeWindows()
 	);
 
 	ShowWindow(m_hwnd, SW_SHOW);
-	SetForegroundWindow(m_hwnd);
-	SetFocus(m_hwnd);
+	UpdateWindow(m_hwnd);
 }
 
-VOID SystemClass::InitialWindowButtons()
+VOID SystemClass::InitialWindowButtons(HWND hWnd)
 {
 	HWND btn = CreateWindow(
 		L"button",
-		L"다시하기",
+		L"시작하기",
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		555,
-		550,
+		270,
+		675,
 		100,
 		30,
-		m_hwnd,
+		hWnd,
 		(HMENU)IDC_BTN_START,
+		m_hinstance,
+		nullptr
+	);
+
+	CreateWindow(
+		L"button",
+		L"종료하기",
+		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		594,
+		675,
+		100,
+		30,
+		hWnd,
+		(HMENU)IDC_BTN_END,
 		m_hinstance,
 		nullptr
 	);
@@ -141,7 +154,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 	switch (uMessage)
 	{
 		case WM_CREATE:
-			ApplicationHandle->InitialWindowButtons();
+			ApplicationHandle->InitialWindowButtons(hWnd);
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);

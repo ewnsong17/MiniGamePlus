@@ -9,10 +9,9 @@ public:
 	BOOL Initialize();
 	VOID Shutdown();
 	VOID Run();
-	VOID InitialWindowButtons();
-	VOID PaintScreen();
 
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
+	VOID InitialWindowButtons(HWND hWnd);
 
 private:
 	BOOL Frame();
@@ -24,8 +23,6 @@ private:
 	HINSTANCE m_hinstance;
 	WNDCLASSEX wnd_class;
 	HWND m_hwnd;
-	INT screenWidth = 1024;
-	INT screenHeight = 768;
 
 	InputClass* m_Input = nullptr;
 };
