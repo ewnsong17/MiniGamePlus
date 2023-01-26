@@ -1,5 +1,6 @@
 #pragma once
 
+class GraphicClass;
 class InputClass;
 
 
@@ -25,6 +26,7 @@ private:
 	HWND m_hwnd;
 
 	InputClass* m_Input = nullptr;
+	GraphicClass* m_Graphic = nullptr;
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

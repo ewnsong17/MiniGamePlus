@@ -3,60 +3,96 @@
 
 VOID GraphicClass::PaintScreen(HWND hWnd)
 {
+	if (this == nullptr)
+	{
+		return;
+	}
+
 	PAINTSTRUCT ps;
-	SetMemory(hWnd, &ps);
+	HDC hDC = BeginPaint(hWnd, &ps);
 
-	SetBkMode(hDC, TRANSPARENT);
-	PaintBackGround();
+	if (g_ipRT == nullptr)
+	{
+	//	//		InitializeRT(hWnd);
+	//		//	AutoLoadImage
+	}
+	else
+	{
+		HRESULT hr = E_FAIL;
+		g_ipRT->BeginDraw();
+		g_ipRT->SetTransform(D2D1::Matrix3x2F::Identity());
+		g_ipRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-	Release(hWnd, &ps);
+		if (g_ipD2DBitmap != nullptr)
+		{
+			D2D1_RECT_F dxArea = D2D1::RectF(0.0f, 0.0f, 300.0f, 300.0f);
+			g_ipRT->DrawBitmap(g_ipD2DBitmap, dxArea);
+		}
+
+		hr = g_ipRT->EndDraw();
+	}
+
+	EndPaint(hWnd, &ps);
 }
 
-VOID GraphicClass::SetMemory(HWND hWnd, PAINTSTRUCT* ps)
+VOID GraphicClass::Initialize(HWND hWnd)
 {
-	hDC = BeginPaint(hWnd, ps);
-	hMemDC = CreateCompatibleDC(hDC);
-	hBackMemDC = CreateCompatibleDC(hDC);
+	HRESULT hr = E_FAIL;
+
+	//싱글 스레드로 D2D Factory 생성
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_ipD2DFactory);
+
+	assert(hr == S_OK);
+
+	RECT r;
+	GetClientRect(hWnd, &r);
+
+	g_ipD2DFactory->CreateHwndRenderTarget(
+		D2D1::RenderTargetProperties(),
+		D2D1::HwndRenderTargetProperties(hWnd, D2D1::SizeU(r.right - r.left, r.bottom - r.top)),
+		&g_ipRT
+	);
+
+	//Windows Imaging Component Factory 생성
+	hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_ipWICFactory));
+
+	assert(hr == S_OK);
+
+	CreateBitMap(L"background.jpg");
 }
 
-VOID GraphicClass::Release(HWND hWnd, PAINTSTRUCT* ps)
+VOID GraphicClass::CreateBitMap(LPCWSTR imagePath)
 {
-	DeleteDC(hMemDC);
-	DeleteDC(hBackMemDC);
+	IWICBitmapDecoder* ipDecoderPtr = nullptr;
+	
+	HRESULT hr = E_FAIL;
 
-	EndPaint(hWnd, ps);
-}
+	//디코더 생성
+	hr = g_ipWICFactory->CreateDecoderFromFilename(L"C:\\Users\\R0720H\\Desktop\\Etc\\Git\\MiniGamePlus\\GameApp\\x64\\Debug\\main_back.jpg", nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &ipDecoderPtr);
 
-VOID GraphicClass::PaintBackGround()
-{
-	BITMAP bit;
+	assert(hr == S_OK);
 
-	//double-buffer
+	//디코더에서 프레임 얻기
+	IWICBitmapFrameDecode* ipFramePtr = nullptr;
+	hr = ipDecoderPtr->GetFrame(0, &ipFramePtr);
+	assert(hr == S_OK);
 
-	//Screen-Size 만큼의 비트맵 생성
-	HBITMAP backBitMap = CreateCompatibleBitmap(hDC, SCREEN_WIDTH, SCREEN_HEIGHT);
+	//프레임을 기반으로 포맷 컨버터 생성
+	SafeRelease(g_ipConvertedSrcBmp);
+	hr = g_ipWICFactory->CreateFormatConverter(&g_ipConvertedSrcBmp);
+	assert(hr == S_OK);
 
-	//생성한 비트맵을 hBackMemDC에 저장
-	HBITMAP hOldBitMap = (HBITMAP)SelectObject(hBackMemDC, backBitMap);
+	hr = g_ipConvertedSrcBmp->Initialize(ipFramePtr, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0f, WICBitmapPaletteTypeCustom);
 
-	//이미지 비트맵 방식으로 로딩
-	HBITMAP hBitMap = (HBITMAP)LoadImage(nullptr, L"background.jpg", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	assert(hr == S_OK);
 
-	//BITMAP-bit에 저장
-	GetObject(hBitMap, sizeof(bit), &bit);
+	//컨버터로 실제 비트맵 생성
+	SafeRelease(g_ipD2DBitmap);
+	hr = g_ipRT->CreateBitmapFromWicBitmap(g_ipConvertedSrcBmp, nullptr, &g_ipD2DBitmap);
 
-	//생성한 비트맵을 hMemDC에 저장
-	HBITMAP hOld = (HBITMAP)SelectObject(hMemDC, hBitMap);
+	assert(hr == S_OK);
 
-	//hMemDC에 저장한 실제 이미지 값을 hBackMemDC에 복사
-	BitBlt(hBackMemDC, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hMemDC, 0, 0, SRCCOPY);
+	SafeRelease(ipDecoderPtr);
+	SafeRelease(ipFramePtr);
 
-	//hBackMemDC에 복사한 이미지를 실제 배경화면 hDC에 복사
-	BitBlt(hDC, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hBackMemDC, 0, 0, SRCCOPY);
-
-	//hOld에 저장된 hBitMap 값을 이전 값으로 다시 변경 (메모리 처리를 위해)
-	SelectObject(hBackMemDC, hOld);
-
-	//메모리 해제
-	DeleteObject(hBitMap);
 }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "InputClass.h"
+#include "GraphicClass.h"
 #include "SystemClass.h"
 
 BOOL SystemClass::Initialize()
@@ -17,6 +18,17 @@ BOOL SystemClass::Initialize()
 
 	//클래스 초기화
 	m_Input->Initialize();
+
+	//DirectX 그래픽 클래스 생성
+	m_Graphic = new GraphicClass;
+
+	if (!m_Graphic)
+	{
+		return FALSE;
+	}
+
+	m_Graphic->Initialize(m_hwnd);
+
 	return TRUE;
 }
 

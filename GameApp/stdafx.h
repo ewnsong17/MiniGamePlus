@@ -3,13 +3,19 @@
 // 들어 있는 포함 파일입니다.
 //
 
+
+//동적 라이브러리 로딩입니다.
 #pragma once
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "WindowsCodecs.lib")
 
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용은 Windows 헤더에서 제외합니다.
 // Windows 헤더 파일:
 #include <windows.h>
+#include <string>
+#include <cassert>
 
 // C 런타임 헤더 파일입니다.
 #include <stdlib.h>
@@ -17,7 +23,12 @@
 #include <memory.h>
 #include <tchar.h>
 
-//constexpr 변수도 여기다 선언해보겠습니당.
+//DirectX 관련 헤더 파일입니다.
+#include <wincodec.h>
+#include <d2d1.h>
+#include <d2d1helper.h>
+
+//커맨드 관련 변수입니다.
 constexpr int IDC_BTN_START = 1003;
 constexpr int IDC_BTN_END = 1004;
 constexpr int IDC_TEXT_WORD = 1005;

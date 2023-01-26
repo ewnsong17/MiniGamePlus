@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "SystemClass.h"
-#include "InputClass.h"
 #include "GraphicClass.h"
+#include "InputClass.h"
 
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMessage)
 	{
 		case WM_PAINT:
-			GraphicHandle->PaintScreen(hWnd);
+			m_Graphic->PaintScreen(hWnd);
 			break;
 		case WM_KEYDOWN:
 			m_Input->KeyDown((unsigned int)wParam);
