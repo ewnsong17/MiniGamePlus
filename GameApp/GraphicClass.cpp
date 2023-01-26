@@ -35,7 +35,7 @@ VOID GraphicClass::PaintScreen(HWND hWnd)
 		}
 
 		//글씨 폰트 로딩
-		if (!FAILED(LoadFont(L"돋움", 40.f)))
+		if (!FAILED(LoadFont(L"Ms Shell Dlg", 32.f, D2D1::ColorF(1.0f, 1.0f, 1.0f))))
 		{
 			LPCWSTR str = L"미니게임마스터!";
 			g_ipRT->DrawTextW(str, wcslen(str), g_writeFormat, D2D1::RectF(0, 0, SCREEN_WIDTH, 200.f), g_brush);
@@ -120,7 +120,7 @@ HRESULT GraphicClass::LoadBitMap(LPCWSTR imagePath)
 	return hr;
 }
 
-HRESULT GraphicClass::LoadFont(LPCWSTR fontName, FLOAT fontSize)
+HRESULT GraphicClass::LoadFont(LPCWSTR fontName, FLOAT fontSize, D2D1::ColorF fontColor)
 {
 	HRESULT hr = E_FAIL;
 
@@ -143,7 +143,7 @@ HRESULT GraphicClass::LoadFont(LPCWSTR fontName, FLOAT fontSize)
 
 	assert(hr == S_OK);
 
-	hr = g_ipRT->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f), &g_brush);
+	hr = g_ipRT->CreateSolidColorBrush(fontColor, &g_brush);
 
 	return hr;
 }

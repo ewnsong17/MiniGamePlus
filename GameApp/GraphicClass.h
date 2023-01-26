@@ -19,7 +19,7 @@ public:
 
 	HRESULT LoadBitMap(LPCWSTR imagePath);
 
-	HRESULT LoadFont(LPCWSTR fontName, FLOAT fontSize);
+	HRESULT LoadFont(LPCWSTR fontName, FLOAT fontSize, D2D1::ColorF fontColor);
 
 	
 private:
