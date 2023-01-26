@@ -16,6 +16,7 @@
 #include <windows.h>
 #include <string>
 #include <cassert>
+#include <iostream>
 
 // C 런타임 헤더 파일입니다.
 #include <stdlib.h>
@@ -27,6 +28,7 @@
 #include <wincodec.h>
 #include <d2d1.h>
 #include <d2d1helper.h>
+#include <dwrite.h>
 
 //커맨드 관련 변수입니다.
 constexpr int IDC_BTN_START = 1003;

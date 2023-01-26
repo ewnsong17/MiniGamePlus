@@ -11,24 +11,37 @@ VOID GraphicClass::PaintScreen(HWND hWnd)
 	PAINTSTRUCT ps;
 	HDC hDC = BeginPaint(hWnd, &ps);
 
-	if (g_ipRT == nullptr)
+	HRESULT hr = E_FAIL;
+
+	if (g_ipRT != nullptr)
 	{
-	//	//		InitializeRT(hWnd);
-	//		//	AutoLoadImage
-	}
-	else
-	{
-		HRESULT hr = E_FAIL;
+		RECT r;
+		GetClientRect(hWnd, &r);
+
+		//hDC 동기화
+		g_ipRT->BindDC(hDC, &r);
+
+
+		//기존 화면 초기화
 		g_ipRT->BeginDraw();
 		g_ipRT->SetTransform(D2D1::Matrix3x2F::Identity());
 		g_ipRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
-		if (g_ipD2DBitmap != nullptr)
+		//로딩한 이미지가 있을 경우 그리기
+		if (!FAILED(LoadBitMap(L"image\\main_back.jpg")))
 		{
-			D2D1_RECT_F dxArea = D2D1::RectF(0.0f, 0.0f, 300.0f, 300.0f);
+			D2D1_RECT_F dxArea = D2D1::RectF(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 			g_ipRT->DrawBitmap(g_ipD2DBitmap, dxArea);
 		}
 
+		//글씨 폰트 로딩
+		if (!FAILED(LoadFont(L"돋움", 40.f)))
+		{
+			LPCWSTR str = L"test123";
+			g_ipRT->DrawTextW(str, wcslen(str), g_writeFormat, D2D1::RectF(0, 0, 600.f, 500.f), g_brush);
+		}
+
+		//그리기 해제
 		hr = g_ipRT->EndDraw();
 	}
 
@@ -39,36 +52,45 @@ VOID GraphicClass::Initialize(HWND hWnd)
 {
 	HRESULT hr = E_FAIL;
 
-	//싱글 스레드로 D2D Factory 생성
-	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_ipD2DFactory);
-
-	assert(hr == S_OK);
-
 	RECT r;
 	GetClientRect(hWnd, &r);
 
-	g_ipD2DFactory->CreateHwndRenderTarget(
-		D2D1::RenderTargetProperties(),
-		D2D1::HwndRenderTargetProperties(hWnd, D2D1::SizeU(r.right - r.left, r.bottom - r.top)),
-		&g_ipRT
-	);
-
 	//Windows Imaging Component Factory 생성
-	hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&g_ipWICFactory));
+	hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<void**>(&g_ipWICFactory));
 
 	assert(hr == S_OK);
 
-	CreateBitMap(L"background.jpg");
+	//DCRenderTarget 생성 (윈도우 창과 연동됨)
+	auto props = D2D1::RenderTargetProperties(
+		D2D1_RENDER_TARGET_TYPE_DEFAULT,
+		D2D1::PixelFormat(
+			DXGI_FORMAT_B8G8R8A8_UNORM,
+			D2D1_ALPHA_MODE_IGNORE),
+		0,
+		0,
+		D2D1_RENDER_TARGET_USAGE_NONE,
+		D2D1_FEATURE_LEVEL_DEFAULT
+	);
+
+	//D2D1 Factory 생성
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_ipD2DFactory);
+
+	hr = g_ipD2DFactory->CreateDCRenderTarget(
+		&props,
+		&g_ipRT
+	);
+
+	assert(hr == S_OK);
 }
 
-VOID GraphicClass::CreateBitMap(LPCWSTR imagePath)
+HRESULT GraphicClass::LoadBitMap(LPCWSTR imagePath)
 {
 	IWICBitmapDecoder* ipDecoderPtr = nullptr;
 	
 	HRESULT hr = E_FAIL;
 
 	//디코더 생성
-	hr = g_ipWICFactory->CreateDecoderFromFilename(L"C:\\Users\\R0720H\\Desktop\\Etc\\Git\\MiniGamePlus\\GameApp\\x64\\Debug\\main_back.jpg", nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &ipDecoderPtr);
+	hr = g_ipWICFactory->CreateDecoderFromFilename(imagePath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &ipDecoderPtr);
 
 	assert(hr == S_OK);
 
@@ -82,7 +104,7 @@ VOID GraphicClass::CreateBitMap(LPCWSTR imagePath)
 	hr = g_ipWICFactory->CreateFormatConverter(&g_ipConvertedSrcBmp);
 	assert(hr == S_OK);
 
-	hr = g_ipConvertedSrcBmp->Initialize(ipFramePtr, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0f, WICBitmapPaletteTypeCustom);
+	hr = g_ipConvertedSrcBmp->Initialize(ipFramePtr, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0f, WICBitmapPaletteTypeMedianCut);
 
 	assert(hr == S_OK);
 
@@ -95,4 +117,30 @@ VOID GraphicClass::CreateBitMap(LPCWSTR imagePath)
 	SafeRelease(ipDecoderPtr);
 	SafeRelease(ipFramePtr);
 
+	return hr;
+}
+
+HRESULT GraphicClass::LoadFont(LPCWSTR fontName, FLOAT fontSize)
+{
+	HRESULT hr = E_FAIL;
+
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(g_writeFactory), (IUnknown**)g_writeFactory);
+
+	assert(hr == S_OK);
+
+	hr = g_writeFactory->CreateTextFormat(
+		fontName, 
+		0, 
+		DWRITE_FONT_WEIGHT_REGULAR, 
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"ko",
+		&g_writeFormat);
+
+	assert(hr == S_OK);
+
+	hr = g_ipRT->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f), &g_brush);
+
+	return hr;
 }

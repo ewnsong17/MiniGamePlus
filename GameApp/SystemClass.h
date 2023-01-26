@@ -12,6 +12,7 @@ public:
 	VOID Run();
 
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
+	VOID CommandHandler(HWND, UINT, WPARAM, LPARAM);
 	VOID InitialWindowButtons(HWND hWnd);
 
 private:

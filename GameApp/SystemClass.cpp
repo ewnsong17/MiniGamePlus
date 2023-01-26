@@ -67,15 +67,19 @@ VOID SystemClass::InitializeWindows()
 		nullptr
 	);
 
-	ShowWindow(m_hwnd, SW_SHOW);
-	UpdateWindow(m_hwnd);
+	if (m_hwnd)
+	{
+		ShowWindow(m_hwnd, SW_SHOW);
+		UpdateWindow(m_hwnd);
+	}
 }
 
 VOID SystemClass::InitialWindowButtons(HWND hWnd)
 {
+
 	HWND btn = CreateWindow(
 		L"button",
-		L"시작하기",
+		L"게임시작",
 		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 		270,
 		675,

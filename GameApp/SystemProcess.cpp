@@ -16,8 +16,21 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 		case WM_KEYUP:
 			m_Input->KeyUp((unsigned int)wParam);
 			break;
+		case WM_COMMAND:
+			CommandHandler(hWnd, uMessage, wParam, lParam);
+			break;
 		default:
 			return DefWindowProc(hWnd, uMessage, wParam, lParam);
 	}
 	return 0;
+}
+
+VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
+{
+	switch (LOWORD(wParam))
+	{
+		case IDC_BTN_END:
+			PostMessage(hWnd, WM_DESTROY, wParam, lParam);
+			break;
+	}
 }
