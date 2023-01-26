@@ -18,8 +18,10 @@ public:
 	}
 
 	HRESULT LoadBitMap(LPCWSTR imagePath);
+
 	HRESULT LoadFont(LPCWSTR fontName, FLOAT fontSize);
 
+	
 private:
 	ID2D1Factory* g_ipD2DFactory = nullptr;
 	IWICImagingFactory* g_ipWICFactory = nullptr;

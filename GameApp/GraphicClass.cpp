@@ -37,8 +37,8 @@ VOID GraphicClass::PaintScreen(HWND hWnd)
 		//글씨 폰트 로딩
 		if (!FAILED(LoadFont(L"돋움", 40.f)))
 		{
-			LPCWSTR str = L"test123";
-			g_ipRT->DrawTextW(str, wcslen(str), g_writeFormat, D2D1::RectF(0, 0, 600.f, 500.f), g_brush);
+			LPCWSTR str = L"미니게임마스터!";
+			g_ipRT->DrawTextW(str, wcslen(str), g_writeFormat, D2D1::RectF(0, 0, SCREEN_WIDTH, 200.f), g_brush);
 		}
 
 		//그리기 해제
@@ -124,19 +124,22 @@ HRESULT GraphicClass::LoadFont(LPCWSTR fontName, FLOAT fontSize)
 {
 	HRESULT hr = E_FAIL;
 
-	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(g_writeFactory), (IUnknown**)g_writeFactory);
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(g_writeFactory), (IUnknown**)&g_writeFactory);
 
 	assert(hr == S_OK);
 
 	hr = g_writeFactory->CreateTextFormat(
-		fontName, 
-		0, 
-		DWRITE_FONT_WEIGHT_REGULAR, 
+		fontName,
+		0,
+		DWRITE_FONT_WEIGHT_REGULAR,
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"ko",
 		&g_writeFormat);
+
+	g_writeFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	g_writeFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 	assert(hr == S_OK);
 
