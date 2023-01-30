@@ -5,7 +5,7 @@ GraphicClass::GraphicClass() :
 
 	m_pDirect2DFactory(nullptr),
 	m_pRenderTarget(nullptr),
-	m_pLightSlateGrayBrush(nullptr),
+	m_pCornSlikBrush(nullptr),
 	m_pCornflowerBlueBrush(nullptr),
 	m_pIWICFactory(nullptr),
 	m_pDWriteFactory(nullptr),
@@ -16,7 +16,7 @@ GraphicClass::~GraphicClass()
 {
 	SafeRelease(m_pDirect2DFactory);
 	SafeRelease(m_pRenderTarget);
-	SafeRelease(m_pLightSlateGrayBrush);
+	SafeRelease(m_pCornSlikBrush);
 	SafeRelease(m_pCornflowerBlueBrush);
 	SafeRelease(m_pIWICFactory);
 	SafeRelease(m_pDWriteFactory);
@@ -75,7 +75,7 @@ HRESULT GraphicClass::CreateDeviceResources(HWND hWnd)
 
 		if (SUCCEEDED(hr))
 		{
-			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightSlateGray), &m_pLightSlateGrayBrush);
+			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Cornsilk), &m_pCornSlikBrush);
 		}
 
 		if (SUCCEEDED(hr))
@@ -87,33 +87,150 @@ HRESULT GraphicClass::CreateDeviceResources(HWND hWnd)
 	return hr;
 }
 
-VOID GraphicClass::OnRender(HWND hWnd, UINT m_stageCnt)
+VOID GraphicClass::OnRender(HWND hWnd, UINT m_stageCnt, IGame* game)
 {
 	PAINTSTRUCT ps;
 	BeginPaint(hWnd, &ps);
 
-	//TODO::상황별 이미지 처리
-	if (m_stageCnt <= SELECT_GAME)
+	if (m_stageCnt > SELECT_GAME)
 	{
-		this->OnRenderImage(hWnd, L"image\\main_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+		this->OnRenderImage(hWnd, L"image\\game_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
 	}
 	else
 	{
-		this->OnRenderImage(hWnd, L"image\\game_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+		this->OnRenderImage(hWnd, L"image\\main_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
 	}
 
 	//TODO::상황별 텍스트 처리
 	switch (m_stageCnt)
 	{
 		case START_GAME:
-			this->OnRenderText(hWnd, L"미니게임마스터!", D2D1::SizeF(SCREEN_WIDTH, 200.f));
+			this->OnRenderText(hWnd, L"미니게임마스터!", D2D1::SizeF(SCREEN_WIDTH, 200.f), m_pCornflowerBlueBrush);
 			break;
 		case SELECT_GAME:
-			this->OnRenderText(hWnd, L"원하시는 게임을 선택해주세요.", D2D1::SizeF(SCREEN_WIDTH, 200.f));
+			this->OnRenderText(hWnd, L"원하시는 게임을 선택해주세요.", D2D1::SizeF(SCREEN_WIDTH, 200.f), m_pCornflowerBlueBrush);
 			break;
 	}
 
+	//TODO::게임 별 이미지 처리
+	if (game != nullptr)
+	{
+		switch (m_stageCnt)
+		{
+			case CARD_GAME:
+				OnUpdateCardGame(hWnd, (CardGameClass*) game);
+				break;
+			case YUT_GAME:
+				break;
+			case OMOK_GAME:
+				break;
+		}
+	}
+
 	EndPaint(hWnd, &ps);
+}
+
+VOID GraphicClass::OnUpdateCardGame(HWND hWnd, CardGameClass* game)
+{
+	//턴 계산
+	if (game->player_turn == 0)
+	{
+		this->OnRenderText(hWnd, L"당신의 차례입니다.", D2D1::SizeF(SCREEN_WIDTH, 350.f), m_pCornSlikBrush);
+	}
+	else
+	{
+		std::wstring str = std::to_wstring(game->player_turn) + L"님의 차례입니다.";
+		this->OnRenderText(hWnd, str.c_str(), D2D1::SizeF(SCREEN_WIDTH, 350.f), m_pCornSlikBrush);
+	}
+
+
+
+
+	D2D1_POINT_2F ltSize;
+	D2D1_POINT_2F imageCenter;
+
+	//무덤에 다음 카드 그려주기
+	Card* next_card = game->GetNextCard();
+	
+	ltSize = D2D1::Point2F(450.f, 250.f);
+
+	this->OnRenderImage(hWnd, game->GetCardImage(next_card).c_str(), D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y + CARD_HEIGHT), FALSE);
+
+
+
+
+	//카드 그림 그려주기
+	std::vector<Card*> card_list;
+
+	//TODO::추후 배열로 변환, 각도 전환이 어려워서 우선 하드코딩 처리
+
+	//내꺼 그려주기
+	card_list = game->GetPlayerCards(0);
+
+	for (int i = 0; i < card_list.size(); i++)
+	{
+		ltSize = D2D1::Point2F(350.f + (i * 30), 620.f);
+
+		this->OnRenderImage(hWnd, game->GetCardImage(card_list[i]).c_str(), D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y + CARD_HEIGHT), FALSE);
+	}
+
+
+
+	//왼쪽 플레이어
+	card_list = game->GetPlayerCards(1);
+
+	ltSize = D2D1::Point2F(150.f, 210.f);
+	imageCenter = D2D1::Point2F(
+		ltSize.x + CARD_WIDTH / 2,
+		ltSize.y + CARD_HEIGHT / 2
+	);
+
+	m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-90, imageCenter));
+
+	for (int i = 0; i < card_list.size(); i++)
+	{
+		ltSize.x -= 30;
+
+		this->OnRenderImage(hWnd, L"image\\Card\\back.png", D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT), FALSE);
+	}
+
+
+
+	//위쪽 플레이어
+	card_list = game->GetPlayerCards(2);
+
+	ltSize = D2D1::Point2F(450.f, 110.f);
+	imageCenter = D2D1::Point2F(
+		ltSize.x + CARD_WIDTH / 2,
+		ltSize.y + CARD_HEIGHT / 2
+	);
+
+	m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-360, imageCenter));
+
+	for (int i = 0; i < card_list.size(); i++)
+	{
+		ltSize.x -= 30;
+		this->OnRenderImage(hWnd, L"image\\Card\\back.png", D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT), FALSE);
+	}
+
+
+
+	//왼쪽 플레이어
+	card_list = game->GetPlayerCards(3);
+
+	ltSize = D2D1::Point2F(1040.f, 150.f);
+	imageCenter = D2D1::Point2F(
+		ltSize.x + CARD_WIDTH / 2,
+		ltSize.y + CARD_HEIGHT / 2
+	);
+
+	m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-90, imageCenter));
+
+	for (int i = 0; i < card_list.size(); i++)
+	{
+		ltSize.x -= 30;
+		this->OnRenderImage(hWnd, L"image\\Card\\back.png", D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT), FALSE);
+	}
 }
 
 HRESULT GraphicClass::OnRenderImage(HWND hWnd, LPCWSTR uri, D2D1_RECT_F rtSize, BOOL bReset)
@@ -156,7 +273,7 @@ HRESULT GraphicClass::OnRenderImage(HWND hWnd, LPCWSTR uri, D2D1_RECT_F rtSize, 
 	return hr;
 }
 
-HRESULT GraphicClass::OnRenderText(HWND hWnd, LPCWSTR text, D2D1_SIZE_F rtSize, BOOL bReset)
+HRESULT GraphicClass::OnRenderText(HWND hWnd, LPCWSTR text, D2D1_SIZE_F rtSize, ID2D1SolidColorBrush* brush, BOOL bReset)
 {
 	HRESULT hr = CreateDeviceResources(hWnd);
 
@@ -171,7 +288,7 @@ HRESULT GraphicClass::OnRenderText(HWND hWnd, LPCWSTR text, D2D1_SIZE_F rtSize, 
 			m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 		}
 
-		m_pRenderTarget->DrawTextW(text, wcslen(text), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornflowerBlueBrush);
+		m_pRenderTarget->DrawTextW(text, wcslen(text), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), brush);
 
 		hr = m_pRenderTarget->EndDraw();
 	}

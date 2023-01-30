@@ -1,4 +1,6 @@
 #pragma once
+#include "IGame.h"
+#include <card/CardGameClass.h>
 
 class GraphicClass
 {
@@ -8,11 +10,14 @@ public:
 
 	HRESULT CreateDeviceIndependentResources(LPCWSTR fontName, float fontSize);
 	HRESULT CreateDeviceResources(HWND hWnd);
-	VOID OnRender(HWND hWnd, UINT m_stageCnt);
+	VOID OnRender(HWND hWnd, UINT m_stageCnt, IGame* game);
 	HRESULT OnRenderImage(HWND hWnd, LPCWSTR uri, D2D1_RECT_F rtSize, BOOL bReset = FALSE);
-	HRESULT OnRenderText(HWND hWnd, LPCWSTR text, D2D1_SIZE_F rtSize, BOOL bReset = FALSE);
+	HRESULT OnRenderText(HWND hWnd, LPCWSTR text, D2D1_SIZE_F rtSize, ID2D1SolidColorBrush* brush, BOOL bReset = FALSE);
 	VOID OnResize(UINT width, UINT height);
 	HRESULT LoadBitmapFromFile(LPCWSTR uri, ID2D1Bitmap** ppBitmap);
+
+
+	VOID OnUpdateCardGame(HWND hWnd, CardGameClass* game);
 
 	template <typename T>
 	inline VOID SafeRelease(T*& p)
@@ -27,14 +32,14 @@ public:
 	inline VOID DiscardDeviceResources()
 	{
 		SafeRelease(m_pRenderTarget);
-		SafeRelease(m_pLightSlateGrayBrush);
+		SafeRelease(m_pCornSlikBrush);
 		SafeRelease(m_pCornflowerBlueBrush);
 	}
 
 private:
 	ID2D1Factory* m_pDirect2DFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
-	ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
+	ID2D1SolidColorBrush* m_pCornSlikBrush;
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
 
 	IWICImagingFactory* m_pIWICFactory;

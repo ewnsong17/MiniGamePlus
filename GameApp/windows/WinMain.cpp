@@ -3,6 +3,8 @@
 
 INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszcmParam, int cmdShow)
 {
+	srand((unsigned)time(nullptr));
+
 	SystemClass* system = new SystemClass;
 
 	if (system)

@@ -9,7 +9,7 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 	switch (uMessage)
 	{
 		case WM_PAINT:
-			m_Graphic->OnRender(hWnd, m_stageCnt);
+			m_Graphic->OnRender(hWnd, m_stageCnt, m_Game);
 			break;
 		case WM_SIZE:
 			m_Graphic->OnResize(LOWORD(lParam), HIWORD(lParam));
@@ -32,26 +32,30 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
 	DeleteButtons(hWnd);
-	InvalidateRect(hWnd, nullptr, TRUE);
 
 	switch (LOWORD(wParam))
 	{
 		case IDC_BTN_START:
 			m_stageCnt = SELECT_GAME;
 			CreateButtons(hWnd);
+			InvalidateRect(hWnd, nullptr, TRUE);
 			break;
 		case IDC_BTN_END:
 			PostMessage(hWnd, WM_DESTROY, wParam, lParam);
 			break;
 		case IDC_GAME_CARD:
 			m_stageCnt = CARD_GAME;
-			m_Game = new CardGameClass();
+			m_Game = new CardGameClass(2);
+
+			InvalidateRect(hWnd, nullptr, TRUE);
 			break;
 		case IDC_GAME_YUT:
 			m_stageCnt = YUT_GAME;
+			InvalidateRect(hWnd, nullptr, TRUE);
 			break;
 		case IDC_GAME_OMOK:
 			m_stageCnt = OMOK_GAME;
+			InvalidateRect(hWnd, nullptr, TRUE);
 			break;
 	}
 }

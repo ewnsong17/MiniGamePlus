@@ -18,6 +18,7 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 // C 런타임 헤더 파일입니다.
 #include <stdlib.h>
@@ -25,6 +26,7 @@
 #include <memory.h>
 #include <tchar.h>
 #include <windows.h>
+#include <time.h>
 
 //DirectX 관련 헤더 파일입니다.
 #include <wincodec.h>

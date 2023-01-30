@@ -8,6 +8,7 @@ class InputClass;
 class SystemClass
 {
 public:
+
 	BOOL Initialize();
 	VOID Shutdown();
 	VOID Run();
@@ -25,9 +26,9 @@ private:
 private:
 	LPCWSTR m_applicationName = L"미니게임마스터";
 	UINT m_stageCnt = 0;
+	HWND m_hwnd;
 	HINSTANCE m_hinstance;
 	WNDCLASSEX wnd_class;
-	HWND m_hwnd;
 
 	InputClass* m_Input = nullptr;
 	GraphicClass* m_Graphic = nullptr;
