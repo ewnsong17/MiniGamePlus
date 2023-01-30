@@ -11,6 +11,7 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 			m_Graphic->OnRenderImage(hWnd, D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
 			m_Graphic->OnRenderText(hWnd, L"미니게임마스터!", D2D1::SizeF(SCREEN_WIDTH, 200.f));
 			ValidateRect(hWnd, nullptr);
+			SendMessage(hWnd, WM_CREATE, wParam, lParam);
 			break;
 		case WM_SIZE:
 			m_Graphic->OnResize(LOWORD(lParam), HIWORD(lParam));

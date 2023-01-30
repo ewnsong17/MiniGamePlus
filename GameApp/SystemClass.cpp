@@ -81,7 +81,6 @@ VOID SystemClass::InitializeWindows()
 
 VOID SystemClass::InitialWindowButtons(HWND hWnd)
 {
-
 	HWND btn = CreateWindow(
 		L"button",
 		L"게임시작",
