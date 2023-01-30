@@ -13,7 +13,7 @@ BOOL SystemClass::Initialize()
 		return FALSE;
 	}
 
-	HRESULT hr =m_Graphic->CreateDeviceIndependentResources();
+	HRESULT hr =m_Graphic->CreateDeviceIndependentResources(L"Ms Shell Dlg", 32.f);
 
 	if (SUCCEEDED(hr))
 	{

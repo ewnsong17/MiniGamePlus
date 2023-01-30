@@ -8,9 +8,9 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 	switch (uMessage)
 	{
 		case WM_PAINT:
-			m_Graphic->OnRender(hWnd);
+			m_Graphic->OnRenderImage(hWnd, D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+			m_Graphic->OnRenderText(hWnd, L"미니게임마스터!", D2D1::SizeF(SCREEN_WIDTH, 200.f));
 			ValidateRect(hWnd, nullptr);
-//			m_Graphic->PaintText(hWnd, L"Ms Shell Dlg", 32.f, D2D1::ColorF(1.0f, 1.0f, 1.0f), L"미니게임마스터!");
 			break;
 		case WM_SIZE:
 			m_Graphic->OnResize(LOWORD(lParam), HIWORD(lParam));

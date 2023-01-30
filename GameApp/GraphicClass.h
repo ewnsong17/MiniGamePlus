@@ -6,9 +6,10 @@ public:
 	GraphicClass();
 	~GraphicClass();
 
-	HRESULT CreateDeviceIndependentResources();
+	HRESULT CreateDeviceIndependentResources(LPCWSTR fontName, float fontSize);
 	HRESULT CreateDeviceResources(HWND hWnd);
-	HRESULT OnRender(HWND hWnd);
+	HRESULT OnRenderImage(HWND hWnd, D2D1_RECT_F rtSize, BOOL bReset = FALSE);
+	HRESULT OnRenderText(HWND hWnd, LPCWSTR text, D2D1_SIZE_F rtSize, BOOL bReset = FALSE);
 	VOID OnResize(UINT width, UINT height);
 	HRESULT LoadBitmapFromFile(LPCWSTR uri, ID2D1Bitmap** ppBitmap);
 
@@ -36,4 +37,6 @@ private:
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
 
 	IWICImagingFactory* m_pIWICFactory;
+	IDWriteFactory* m_pDWriteFactory;
+	IDWriteTextFormat* m_pTextFormat;
 };

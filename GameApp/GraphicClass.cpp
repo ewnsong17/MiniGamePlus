@@ -6,7 +6,10 @@ GraphicClass::GraphicClass() :
 	m_pDirect2DFactory(nullptr),
 	m_pRenderTarget(nullptr),
 	m_pLightSlateGrayBrush(nullptr),
-	m_pCornflowerBlueBrush(nullptr)
+	m_pCornflowerBlueBrush(nullptr),
+	m_pIWICFactory(nullptr),
+	m_pDWriteFactory(nullptr),
+	m_pTextFormat(nullptr)
 {}
 
 GraphicClass::~GraphicClass()
@@ -15,15 +18,43 @@ GraphicClass::~GraphicClass()
 	SafeRelease(m_pRenderTarget);
 	SafeRelease(m_pLightSlateGrayBrush);
 	SafeRelease(m_pCornflowerBlueBrush);
+	SafeRelease(m_pIWICFactory);
+	SafeRelease(m_pDWriteFactory);
+	SafeRelease(m_pTextFormat);
 }
 
 
-HRESULT GraphicClass::CreateDeviceIndependentResources()
+HRESULT GraphicClass::CreateDeviceIndependentResources(LPCWSTR fontName, float fontSize)
 {
 	HRESULT hr = S_OK;
 
 	//教臂 静饭靛 蒲配府 积己
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2DFactory);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(m_pDWriteFactory), reinterpret_cast<IUnknown**>(&m_pDWriteFactory));
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pDWriteFactory->CreateTextFormat(
+			fontName,
+			nullptr,
+			DWRITE_FONT_WEIGHT_NORMAL,
+			DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			fontSize,
+			L"kr",
+			&m_pTextFormat
+		);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	}
 
 	return hr;
 }
@@ -56,18 +87,21 @@ HRESULT GraphicClass::CreateDeviceResources(HWND hWnd)
 	return hr;
 }
 
-HRESULT GraphicClass::OnRender(HWND hWnd)
+
+HRESULT GraphicClass::OnRenderImage(HWND hWnd, D2D1_RECT_F rtSize, BOOL bReset)
 {
 	HRESULT hr = CreateDeviceResources(hWnd);
 
 	if (SUCCEEDED(hr))
 	{
-		D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
-		D2D1_POINT_2F lt = D2D1::Point2F(0.f, 0.f);
 
 		m_pRenderTarget->BeginDraw();
-		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+
+		if (bReset)
+		{
+			m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+			m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+		}
 
 		ID2D1Bitmap* bitmap;
 
@@ -77,10 +111,39 @@ HRESULT GraphicClass::OnRender(HWND hWnd)
 		{
 			m_pRenderTarget->DrawBitmap(
 				bitmap,
-				D2D1::RectF(lt.x, lt.y, lt.x + rtSize.width, lt.y + rtSize.height),
+				rtSize,
 				1.f
 			);
 		}
+
+		hr = m_pRenderTarget->EndDraw();
+	}
+
+	if (hr == D2DERR_RECREATE_TARGET)
+	{
+		hr = S_OK;
+		DiscardDeviceResources();
+	}
+
+	return hr;
+}
+
+HRESULT GraphicClass::OnRenderText(HWND hWnd, LPCWSTR text, D2D1_SIZE_F rtSize, BOOL bReset)
+{
+	HRESULT hr = CreateDeviceResources(hWnd);
+
+	if (SUCCEEDED(hr))
+	{
+
+		m_pRenderTarget->BeginDraw();
+
+		if (bReset)
+		{
+			m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+			m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+		}
+
+		m_pRenderTarget->DrawTextW(text, wcslen(text), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornflowerBlueBrush);
 
 		hr = m_pRenderTarget->EndDraw();
 	}
