@@ -1,17 +1,15 @@
 #include "stdafx.h"
-#include "SystemClass.h"
-#include "GraphicClass.h"
-#include "InputClass.h"
+#include "input/InputClass.h"
+#include "graphic/GraphicClass.h"
+#include "system/SystemClass.h"
+#include "card/CardGameClass.h"
 
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMessage)
 	{
 		case WM_PAINT:
-			m_Graphic->OnRenderImage(hWnd, D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
-			m_Graphic->OnRenderText(hWnd, L"미니게임마스터!", D2D1::SizeF(SCREEN_WIDTH, 200.f));
-			ValidateRect(hWnd, nullptr);
-			SendMessage(hWnd, WM_CREATE, wParam, lParam);
+			m_Graphic->OnRender(hWnd, m_stageCnt);
 			break;
 		case WM_SIZE:
 			m_Graphic->OnResize(LOWORD(lParam), HIWORD(lParam));
@@ -33,13 +31,27 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 
 VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
+	DeleteButtons(hWnd);
+	InvalidateRect(hWnd, nullptr, TRUE);
+
 	switch (LOWORD(wParam))
 	{
 		case IDC_BTN_START:
-//			m_Graphic->PaintText(hWnd, L"Ms Shell Dlg", 32.f, D2D1::ColorF(1.0f, 1.0f, 1.0f), L"미니게임마스터!");
+			m_stageCnt = SELECT_GAME;
+			CreateButtons(hWnd);
 			break;
 		case IDC_BTN_END:
 			PostMessage(hWnd, WM_DESTROY, wParam, lParam);
+			break;
+		case IDC_GAME_CARD:
+			m_stageCnt = CARD_GAME;
+			m_Game = new CardGameClass();
+			break;
+		case IDC_GAME_YUT:
+			m_stageCnt = YUT_GAME;
+			break;
+		case IDC_GAME_OMOK:
+			m_stageCnt = OMOK_GAME;
 			break;
 	}
 }

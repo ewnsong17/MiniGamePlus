@@ -1,4 +1,5 @@
 #pragma once
+#include "IGame.h"
 
 class GraphicClass;
 class InputClass;
@@ -13,7 +14,8 @@ public:
 
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 	VOID CommandHandler(HWND, UINT, WPARAM, LPARAM);
-	VOID InitialWindowButtons(HWND hWnd);
+	VOID CreateButtons(HWND hWnd);
+	VOID DeleteButtons(HWND hWnd);
 
 private:
 	BOOL Frame();
@@ -22,12 +24,17 @@ private:
 
 private:
 	LPCWSTR m_applicationName = L"미니게임마스터";
+	UINT m_stageCnt = 0;
 	HINSTANCE m_hinstance;
 	WNDCLASSEX wnd_class;
 	HWND m_hwnd;
 
 	InputClass* m_Input = nullptr;
 	GraphicClass* m_Graphic = nullptr;
+
+	std::vector<HWND> m_EditCtrl;
+
+	IGame* m_Game = nullptr;
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

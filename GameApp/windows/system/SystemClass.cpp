@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "InputClass.h"
-#include "GraphicClass.h"
-#include "SystemClass.h"
+#include "input/InputClass.h"
+#include "graphic/GraphicClass.h"
+#include "system/SystemClass.h"
 
 BOOL SystemClass::Initialize()
 {
@@ -79,35 +79,112 @@ VOID SystemClass::InitializeWindows()
 	}
 }
 
-VOID SystemClass::InitialWindowButtons(HWND hWnd)
+VOID SystemClass::DeleteButtons(HWND hWnd)
 {
-	HWND btn = CreateWindow(
-		L"button",
-		L"게임시작",
-		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		270,
-		675,
-		100,
-		30,
-		hWnd,
-		(HMENU)IDC_BTN_START,
-		m_hinstance,
-		nullptr
-	);
+	for (auto iter = m_EditCtrl.begin(); iter != m_EditCtrl.end(); iter++)
+	{
+		DestroyWindow(*iter);
+	}
+}
 
-	CreateWindow(
-		L"button",
-		L"종료하기",
-		WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		594,
-		675,
-		100,
-		30,
-		hWnd,
-		(HMENU)IDC_BTN_END,
-		m_hinstance,
-		nullptr
-	);
+VOID SystemClass::CreateButtons(HWND hWnd)
+{
+	switch (m_stageCnt)
+	{
+		case START_GAME:
+		{
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"게임시작",
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					270,
+					675,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_BTN_START,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"종료하기",
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					594,
+					675,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_BTN_END,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			break;
+		}
+		case SELECT_GAME:
+		{
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"원카드",
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					270,
+					675,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_GAME_CARD,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"윷놀이",
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					432,
+					675,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_GAME_YUT,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"오목",
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					594,
+					675,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_GAME_OMOK,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			break;
+		}
+	}
 }
 
 VOID SystemClass::Run()
@@ -174,7 +251,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 	switch (uMessage)
 	{
 		case WM_CREATE:
-			ApplicationHandle->InitialWindowButtons(hWnd);
+			ApplicationHandle->CreateButtons(hWnd);
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);

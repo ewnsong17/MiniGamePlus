@@ -15,45 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="windows\stdafx\stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="SystemClass.h">
+    <ClInclude Include="windows\system\SystemClass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="windows\targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="InputClass.h">
+    <ClInclude Include="windows\input\InputClass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicClass.h">
+    <ClInclude Include="windows\graphic\GraphicClass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="games\IGame.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="resource1.h">
+    <ClInclude Include="games\card\CardGameClass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="windows\stdafx\stdafx.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="SystemClass.cpp">
+    <ClCompile Include="windows\system\SystemClass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="WinMain.cpp">
+    <ClCompile Include="windows\WinMain.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="InputClass.cpp">
+    <ClCompile Include="windows\input\InputClass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="SystemProcess.cpp">
+    <ClCompile Include="windows\system\SystemProcess.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicClass.cpp">
+    <ClCompile Include="windows\graphic\GraphicClass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="games\IGame.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="games\card\CardGameClass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

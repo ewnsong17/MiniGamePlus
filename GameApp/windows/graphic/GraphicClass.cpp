@@ -87,8 +87,36 @@ HRESULT GraphicClass::CreateDeviceResources(HWND hWnd)
 	return hr;
 }
 
+VOID GraphicClass::OnRender(HWND hWnd, UINT m_stageCnt)
+{
+	PAINTSTRUCT ps;
+	BeginPaint(hWnd, &ps);
 
-HRESULT GraphicClass::OnRenderImage(HWND hWnd, D2D1_RECT_F rtSize, BOOL bReset)
+	//TODO::상황별 이미지 처리
+	if (m_stageCnt <= SELECT_GAME)
+	{
+		this->OnRenderImage(hWnd, L"image\\main_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+	}
+	else
+	{
+		this->OnRenderImage(hWnd, L"image\\game_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+	}
+
+	//TODO::상황별 텍스트 처리
+	switch (m_stageCnt)
+	{
+		case START_GAME:
+			this->OnRenderText(hWnd, L"미니게임마스터!", D2D1::SizeF(SCREEN_WIDTH, 200.f));
+			break;
+		case SELECT_GAME:
+			this->OnRenderText(hWnd, L"원하시는 게임을 선택해주세요.", D2D1::SizeF(SCREEN_WIDTH, 200.f));
+			break;
+	}
+
+	EndPaint(hWnd, &ps);
+}
+
+HRESULT GraphicClass::OnRenderImage(HWND hWnd, LPCWSTR uri, D2D1_RECT_F rtSize, BOOL bReset)
 {
 	HRESULT hr = CreateDeviceResources(hWnd);
 
@@ -105,7 +133,7 @@ HRESULT GraphicClass::OnRenderImage(HWND hWnd, D2D1_RECT_F rtSize, BOOL bReset)
 
 		ID2D1Bitmap* bitmap;
 
-		hr = LoadBitmapFromFile(L"image\\main_back.jpg", &bitmap);
+		hr = LoadBitmapFromFile(uri, &bitmap);
 
 		if (SUCCEEDED(hr))
 		{

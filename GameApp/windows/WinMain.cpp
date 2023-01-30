@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "SystemClass.h"
+#include "system/SystemClass.h"
 
 INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszcmParam, int cmdShow)
 {
