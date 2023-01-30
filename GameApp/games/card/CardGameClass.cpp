@@ -30,7 +30,11 @@ CardGameClass::CardGameClass(UINT player_size)
 		card_list[i]->owner = (INT) (i / 7);
 	}
 
-	//4. 다 끝나면 다시 그려진다.
+	//4. 게임 타이머 세팅
+
+	DWORD threadId = 0;
+	DWORD threadParam = 0;
+	CreateThread(nullptr, 0, SystemClass::GameMainThread, &threadParam, 0, &threadId);
 }
 
 Card* CardGameClass::GetNextCard()

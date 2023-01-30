@@ -18,6 +18,8 @@ public:
 	VOID CreateButtons(HWND hWnd);
 	VOID DeleteButtons(HWND hWnd);
 
+	static DWORD WINAPI GameMainThread(LPVOID lpParam);
+
 private:
 	BOOL Frame();
 	VOID InitializeWindows();

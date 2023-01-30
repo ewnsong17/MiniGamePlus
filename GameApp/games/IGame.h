@@ -15,4 +15,6 @@ public:
 	UINT player_size = 4;
 
 	IGame();
+
+	UINT timer = 30;
 };
