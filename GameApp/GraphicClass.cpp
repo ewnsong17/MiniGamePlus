@@ -1,149 +1,150 @@
 #include "stdafx.h"
 #include "GraphicClass.h"
 
-VOID GraphicClass::PaintScreen(HWND hWnd)
+GraphicClass::GraphicClass() :
+
+	m_pDirect2DFactory(nullptr),
+	m_pRenderTarget(nullptr),
+	m_pLightSlateGrayBrush(nullptr),
+	m_pCornflowerBlueBrush(nullptr)
+{}
+
+GraphicClass::~GraphicClass()
 {
-	if (this == nullptr)
-	{
-		return;
-	}
-
-	PAINTSTRUCT ps;
-	HDC hDC = BeginPaint(hWnd, &ps);
-
-	HRESULT hr = E_FAIL;
-
-	if (g_ipRT != nullptr)
-	{
-		RECT r;
-		GetClientRect(hWnd, &r);
-
-		//hDC 동기화
-		g_ipRT->BindDC(hDC, &r);
-
-
-		//기존 화면 초기화
-		g_ipRT->BeginDraw();
-		g_ipRT->SetTransform(D2D1::Matrix3x2F::Identity());
-		g_ipRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
-
-		//로딩한 이미지가 있을 경우 그리기
-		if (!FAILED(LoadBitMap(L"image\\main_back.jpg")))
-		{
-			D2D1_RECT_F dxArea = D2D1::RectF(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
-			g_ipRT->DrawBitmap(g_ipD2DBitmap, dxArea);
-		}
-
-		//글씨 폰트 로딩
-		if (!FAILED(LoadFont(L"Ms Shell Dlg", 32.f, D2D1::ColorF(1.0f, 1.0f, 1.0f))))
-		{
-			LPCWSTR str = L"미니게임마스터!";
-			g_ipRT->DrawTextW(str, wcslen(str), g_writeFormat, D2D1::RectF(0, 0, SCREEN_WIDTH, 200.f), g_brush);
-		}
-
-		//그리기 해제
-		hr = g_ipRT->EndDraw();
-	}
-
-	EndPaint(hWnd, &ps);
+	SafeRelease(m_pDirect2DFactory);
+	SafeRelease(m_pRenderTarget);
+	SafeRelease(m_pLightSlateGrayBrush);
+	SafeRelease(m_pCornflowerBlueBrush);
 }
 
-VOID GraphicClass::Initialize(HWND hWnd)
+
+HRESULT GraphicClass::CreateDeviceIndependentResources()
 {
-	HRESULT hr = E_FAIL;
+	HRESULT hr = S_OK;
 
-	RECT r;
-	GetClientRect(hWnd, &r);
-
-	//Windows Imaging Component Factory 생성
-	hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<void**>(&g_ipWICFactory));
-
-	assert(hr == S_OK);
-
-	//DCRenderTarget 생성 (윈도우 창과 연동됨)
-	auto props = D2D1::RenderTargetProperties(
-		D2D1_RENDER_TARGET_TYPE_DEFAULT,
-		D2D1::PixelFormat(
-			DXGI_FORMAT_B8G8R8A8_UNORM,
-			D2D1_ALPHA_MODE_IGNORE),
-		0,
-		0,
-		D2D1_RENDER_TARGET_USAGE_NONE,
-		D2D1_FEATURE_LEVEL_DEFAULT
-	);
-
-	//D2D1 Factory 생성
-	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &g_ipD2DFactory);
-
-	hr = g_ipD2DFactory->CreateDCRenderTarget(
-		&props,
-		&g_ipRT
-	);
-
-	assert(hr == S_OK);
-}
-
-HRESULT GraphicClass::LoadBitMap(LPCWSTR imagePath)
-{
-	IWICBitmapDecoder* ipDecoderPtr = nullptr;
-	
-	HRESULT hr = E_FAIL;
-
-	//디코더 생성
-	hr = g_ipWICFactory->CreateDecoderFromFilename(imagePath, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &ipDecoderPtr);
-
-	assert(hr == S_OK);
-
-	//디코더에서 프레임 얻기
-	IWICBitmapFrameDecode* ipFramePtr = nullptr;
-	hr = ipDecoderPtr->GetFrame(0, &ipFramePtr);
-	assert(hr == S_OK);
-
-	//프레임을 기반으로 포맷 컨버터 생성
-	SafeRelease(g_ipConvertedSrcBmp);
-	hr = g_ipWICFactory->CreateFormatConverter(&g_ipConvertedSrcBmp);
-	assert(hr == S_OK);
-
-	hr = g_ipConvertedSrcBmp->Initialize(ipFramePtr, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0f, WICBitmapPaletteTypeMedianCut);
-
-	assert(hr == S_OK);
-
-	//컨버터로 실제 비트맵 생성
-	SafeRelease(g_ipD2DBitmap);
-	hr = g_ipRT->CreateBitmapFromWicBitmap(g_ipConvertedSrcBmp, nullptr, &g_ipD2DBitmap);
-
-	assert(hr == S_OK);
-
-	SafeRelease(ipDecoderPtr);
-	SafeRelease(ipFramePtr);
+	//싱글 쓰레드 팩토리 생성
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2DFactory);
 
 	return hr;
 }
 
-HRESULT GraphicClass::LoadFont(LPCWSTR fontName, FLOAT fontSize, D2D1::ColorF fontColor)
+HRESULT GraphicClass::CreateDeviceResources(HWND hWnd)
 {
-	HRESULT hr = E_FAIL;
+	HRESULT hr = S_OK;
 
-	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(g_writeFactory), (IUnknown**)&g_writeFactory);
+	if (!m_pRenderTarget)
+	{
+		RECT rc;
+		GetClientRect(hWnd, &rc);
 
-	assert(hr == S_OK);
+		D2D1_SIZE_U size = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
 
-	hr = g_writeFactory->CreateTextFormat(
-		fontName,
-		0,
-		DWRITE_FONT_WEIGHT_REGULAR,
-		DWRITE_FONT_STYLE_NORMAL,
-		DWRITE_FONT_STRETCH_NORMAL,
-		fontSize,
-		L"ko",
-		&g_writeFormat);
+		//HWND Render Target 생성하여 이미지 그릴 준비
+		hr = m_pDirect2DFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hWnd, size), &m_pRenderTarget);
 
-	g_writeFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-	g_writeFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		if (SUCCEEDED(hr))
+		{
+			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightSlateGray), &m_pLightSlateGrayBrush);
+		}
 
-	assert(hr == S_OK);
+		if (SUCCEEDED(hr))
+		{
+			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::CornflowerBlue), &m_pCornflowerBlueBrush);
+		}
+	}
 
-	hr = g_ipRT->CreateSolidColorBrush(fontColor, &g_brush);
+	return hr;
+}
+
+HRESULT GraphicClass::OnRender(HWND hWnd)
+{
+	HRESULT hr = CreateDeviceResources(hWnd);
+
+	if (SUCCEEDED(hr))
+	{
+		D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
+		D2D1_POINT_2F lt = D2D1::Point2F(0.f, 0.f);
+
+		m_pRenderTarget->BeginDraw();
+		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+
+		ID2D1Bitmap* bitmap;
+
+		hr = LoadBitmapFromFile(L"image\\main_back.jpg", &bitmap);
+
+		if (SUCCEEDED(hr))
+		{
+			m_pRenderTarget->DrawBitmap(
+				bitmap,
+				D2D1::RectF(lt.x, lt.y, lt.x + rtSize.width, lt.y + rtSize.height),
+				1.f
+			);
+		}
+
+		hr = m_pRenderTarget->EndDraw();
+	}
+
+	if (hr == D2DERR_RECREATE_TARGET)
+	{
+		hr = S_OK;
+		DiscardDeviceResources();
+	}
+
+	return hr;
+}
+
+VOID GraphicClass::OnResize(UINT width, UINT height)
+{
+	if (m_pRenderTarget)
+	{
+		m_pRenderTarget->Resize(D2D1::SizeU(width, height));
+	}
+}
+
+HRESULT GraphicClass::LoadBitmapFromFile(LPCWSTR uri, ID2D1Bitmap** ppBitmap)
+{
+	IWICBitmapDecoder* pDecoder = nullptr;
+	IWICBitmapFrameDecode* pSource = nullptr;
+	IWICFormatConverter* pConverter = nullptr;
+
+	HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<void**>(&m_pIWICFactory));
+
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pIWICFactory->CreateDecoderFromFilename(uri, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pDecoder->GetFrame(0, &pSource);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pIWICFactory->CreateFormatConverter(&pConverter);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pConverter->Initialize(
+			pSource,
+			GUID_WICPixelFormat32bppPBGRA,
+			WICBitmapDitherTypeNone,
+			nullptr,
+			0.f,
+			WICBitmapPaletteTypeMedianCut
+		);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pRenderTarget->CreateBitmapFromWicBitmap(pConverter, nullptr, ppBitmap);
+	}
+
+	SafeRelease(pDecoder);
+	SafeRelease(pSource);
+	SafeRelease(pConverter);
 
 	return hr;
 }

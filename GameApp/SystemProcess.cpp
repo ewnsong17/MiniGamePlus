@@ -8,7 +8,12 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 	switch (uMessage)
 	{
 		case WM_PAINT:
-			m_Graphic->PaintScreen(hWnd);
+			m_Graphic->OnRender(hWnd);
+			ValidateRect(hWnd, nullptr);
+//			m_Graphic->PaintText(hWnd, L"Ms Shell Dlg", 32.f, D2D1::ColorF(1.0f, 1.0f, 1.0f), L"미니게임마스터!");
+			break;
+		case WM_SIZE:
+			m_Graphic->OnResize(LOWORD(lParam), HIWORD(lParam));
 			break;
 		case WM_KEYDOWN:
 			m_Input->KeyDown((unsigned int)wParam);
@@ -29,6 +34,9 @@ VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM
 {
 	switch (LOWORD(wParam))
 	{
+		case IDC_BTN_START:
+//			m_Graphic->PaintText(hWnd, L"Ms Shell Dlg", 32.f, D2D1::ColorF(1.0f, 1.0f, 1.0f), L"미니게임마스터!");
+			break;
 		case IDC_BTN_END:
 			PostMessage(hWnd, WM_DESTROY, wParam, lParam);
 			break;

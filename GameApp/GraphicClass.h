@@ -3,9 +3,14 @@
 class GraphicClass
 {
 public:
-	VOID PaintScreen(HWND hWnd);
+	GraphicClass();
+	~GraphicClass();
 
-	VOID Initialize(HWND hWnd);
+	HRESULT CreateDeviceIndependentResources();
+	HRESULT CreateDeviceResources(HWND hWnd);
+	HRESULT OnRender(HWND hWnd);
+	VOID OnResize(UINT width, UINT height);
+	HRESULT LoadBitmapFromFile(LPCWSTR uri, ID2D1Bitmap** ppBitmap);
 
 	template <typename T>
 	inline VOID SafeRelease(T*& p)
@@ -17,21 +22,18 @@ public:
 		}
 	}
 
-	HRESULT LoadBitMap(LPCWSTR imagePath);
+	inline VOID DiscardDeviceResources()
+	{
+		SafeRelease(m_pRenderTarget);
+		SafeRelease(m_pLightSlateGrayBrush);
+		SafeRelease(m_pCornflowerBlueBrush);
+	}
 
-	HRESULT LoadFont(LPCWSTR fontName, FLOAT fontSize, D2D1::ColorF fontColor);
-
-	
 private:
-	ID2D1Factory* g_ipD2DFactory = nullptr;
-	IWICImagingFactory* g_ipWICFactory = nullptr;
-	IWICFormatConverter* g_ipConvertedSrcBmp = nullptr;
-	ID2D1Bitmap* g_ipD2DBitmap = nullptr;
-	ID2D1DCRenderTarget* g_ipRT = nullptr;
+	ID2D1Factory* m_pDirect2DFactory;
+	ID2D1HwndRenderTarget* m_pRenderTarget;
+	ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
+	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
 
-	IDWriteFactory* g_writeFactory = nullptr;
-	IDWriteTextFormat* g_writeFormat = nullptr;
-	IDWriteTextLayout* g_writeLayout = nullptr;
-
-	ID2D1SolidColorBrush* g_brush = nullptr;
+	IWICImagingFactory* m_pIWICFactory;
 };

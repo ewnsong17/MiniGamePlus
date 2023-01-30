@@ -5,20 +5,6 @@
 
 BOOL SystemClass::Initialize()
 {
-	//윈도우 창 생성
-	InitializeWindows();
-
-	//키보드 입력 클래스 생성
-	m_Input = new InputClass;
-
-	if (!m_Input)
-	{
-		return FALSE;
-	}
-
-	//클래스 초기화
-	m_Input->Initialize();
-
 	//DirectX 그래픽 클래스 생성
 	m_Graphic = new GraphicClass;
 
@@ -27,9 +13,28 @@ BOOL SystemClass::Initialize()
 		return FALSE;
 	}
 
-	m_Graphic->Initialize(m_hwnd);
+	HRESULT hr =m_Graphic->CreateDeviceIndependentResources();
 
-	return TRUE;
+	if (SUCCEEDED(hr))
+	{
+		//윈도우 창 생성
+		InitializeWindows();
+
+		//키보드 입력 클래스 생성
+		m_Input = new InputClass;
+
+		if (!m_Input)
+		{
+			return FALSE;
+		}
+
+		//클래스 초기화
+		m_Input->Initialize();
+
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 VOID SystemClass::InitializeWindows()
