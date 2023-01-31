@@ -81,10 +81,10 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 	//지능 추가
 	//우선순위
 
-	pos_list[3]->bClick = player_turn;
-	pos_list[4]->bClick = player_turn;
-	pos_list[5]->bClick = player_turn;
-	pos_list[6]->bClick = player_turn;
+	pos_list[100]->bClick = !player_turn;
+	pos_list[100 - 21]->bClick = !player_turn;
+	pos_list[100 - 42]->bClick = !player_turn;
+	pos_list[100 - 63]->bClick = !player_turn;
 
 	int index = -1;
 
@@ -95,93 +95,141 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 		{
 			break;
 		}
-		//1. 4개에서 5개가 가능하면 제일 먼저 한다.
-		// 
-		//위치당 한쪽이 안막힌 4개가 있는지 검색
 
-		int x_ = i + 110;
+		//1. 4개에서 5개가 가능하면 제일 먼저 한다.
+		//2. 상대의 4개를 무조건 막는다.
+		//위치당 한쪽이상 안막힌 4개가 있는지 검색
+		//양 플레이어 동시 검색 가능하므로 동시 검색
+
+		int x_ = i + 88;
 		if (pos_list.size() > x_)
 		{
-			if (pos_list[i]->bClick == player_turn
-				&& pos_list[(long long)i + 22]->bClick == player_turn
-				&& pos_list[(long long)i + 44]->bClick == player_turn
-				&& pos_list[(long long)i + 66]->bClick == player_turn
-				)
+			for (int turn = 0; turn < player_size; turn++)
 			{
-				if (pos_list[(long long)i + 88]->bClick == CLICK_NONE)
+				if (pos_list[i]->bClick == turn
+					&& pos_list[(long long)i + 22]->bClick == turn
+					&& pos_list[(long long)i + 44]->bClick == turn
+					&& pos_list[(long long)i + 66]->bClick == turn
+					)
 				{
-					index = i + 88;
+					if (i - 22 >= 0)
+					{
+						if (pos_list[(long long)i - 22]->bClick == CLICK_NONE)
+						{
+							index = i - 22;
+						}
+					}
+					
+					if (pos_list[(long long)i + 88]->bClick == CLICK_NONE)
+					{
+						index = i + 88;
+					}
 				}
-				else if (pos_list[(long long)i + 110]->bClick == CLICK_NONE)
+
+				if (turn == player_turn && index >= 0)
 				{
-					index = i + 110;
+					break;
 				}
 			}
 		}
 
-		int y_ = i + 5;
+		int y_ = i + 4;
 		if (pos_list.size() > y_)
 		{
-			if (pos_list[i]->bClick == player_turn
-				&& pos_list[(long long)i + 1]->bClick == player_turn
-				&& pos_list[(long long)i + 2]->bClick == player_turn
-				&& pos_list[(long long)i + 3]->bClick == player_turn
-				)
+			for (int turn = 0; turn < player_size; turn++)
 			{
-				if (pos_list[(long long)i + 4]->bClick == CLICK_NONE)
+				if (pos_list[i]->bClick == turn
+					&& pos_list[(long long)i + 1]->bClick == turn
+					&& pos_list[(long long)i + 2]->bClick == turn
+					&& pos_list[(long long)i + 3]->bClick == turn
+					)
 				{
-					index = i + 4;
+
+					if (i - 1 >= 0)
+					{
+						if (pos_list[(long long)i - 1]->bClick == CLICK_NONE)
+						{
+							index = i - 1;
+						}
+					}
+					
+					if (pos_list[(long long)i + 4]->bClick == CLICK_NONE)
+					{
+						index = i + 4;
+					}
 				}
-				else if (pos_list[(long long)i + 5]->bClick == CLICK_NONE)
+
+				if (turn == player_turn && index >= 0)
 				{
-					index = i + 5;
+					break;
 				}
 			}
 		}
 
-		int rb = i + 115;
+		int rb = i + 92;
 		if (pos_list.size() > rb)
 		{
-			if (pos_list[i]->bClick == player_turn
-				&& pos_list[(long long)i + 23]->bClick == player_turn
-				&& pos_list[(long long)i + 46]->bClick == player_turn
-				&& pos_list[(long long)i + 69]->bClick == player_turn
-				)
+			for (int turn = 0; turn < player_size; turn++)
 			{
-				if (pos_list[(long long)i + 92]->bClick == CLICK_NONE)
+				if (pos_list[i]->bClick == turn
+					&& pos_list[(long long)i + 23]->bClick == turn
+					&& pos_list[(long long)i + 46]->bClick == turn
+					&& pos_list[(long long)i + 69]->bClick == turn
+					)
 				{
-					index = i + 92;
+					if (i - 23 >= 0)
+					{
+						if (pos_list[(long long)i - 23]->bClick == CLICK_NONE)
+						{
+							index = i - 23;
+						}
+					}
+					
+					if (pos_list[(long long)i + 92]->bClick == CLICK_NONE)
+					{
+						index = i + 92;
+					}
 				}
-				else if (pos_list[(long long)i + 115]->bClick == CLICK_NONE)
+
+				if (turn == player_turn && index >= 0)
 				{
-					index = i + 115;
+					break;
 				}
 			}
 		}
 
 
-		int lb = i - 105;
-		if (pos_list.size() > lb)
+		int lb = i + 21;
+		int lb2 = i - 84;
+		if (lb2 >= 0 && pos_list.size() > lb)
 		{
-			if (pos_list[i]->bClick == player_turn
-				&& pos_list[(long long)i - 21]->bClick == player_turn
-				&& pos_list[(long long)i - 42]->bClick == player_turn
-				&& pos_list[(long long)i - 63]->bClick == player_turn
-				)
+			for (int turn = 0; turn < player_size; turn++)
 			{
-				if (pos_list[(long long)i - 84]->bClick == CLICK_NONE)
+				if (pos_list[i]->bClick == turn
+					&& pos_list[(long long)i - 21]->bClick == turn
+					&& pos_list[(long long)i - 42]->bClick == turn
+					&& pos_list[(long long)i - 63]->bClick == turn
+					)
 				{
-					index = i - 84;
+					if (pos_list[(long long) i + 21]->bClick == CLICK_NONE)
+					{
+						index = i + 21;
+					}
+					
+					if (pos_list[(long long)i - 84]->bClick == CLICK_NONE)
+					{
+						index = i - 84;
+					}
 				}
-				else if (pos_list[(long long)i - 105]->bClick == CLICK_NONE)
+
+				if (turn == player_turn && index >= 0)
 				{
-					index = i - 105;
+					break;
 				}
 			}
 		}
 	}
 
-	//2. 상대의 4개를 무조건 막는다.
 	//3. 내 양쪽 안막힌 3개를 잇는다.
 	//4. 내 한쪽 안막힌 3개를 잇는다.
 	//5. 상대 양쪽 안막힌 3개를 막는다.
