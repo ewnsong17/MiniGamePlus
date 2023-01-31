@@ -1,6 +1,7 @@
 #pragma once
 #include "IGame.h"
 #include <card/CardGameClass.h>
+#include <yut/YutGameClass.h>
 #include <omok/OmokGameClass.h>
 
 class GraphicClass
@@ -19,6 +20,7 @@ public:
 
 
 	VOID OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game);
+	VOID OnYutGameInit(HWND hWnd, BOOL bGameEnd, YutGameClass* game);
 	VOID OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game);
 
 	template <typename T>

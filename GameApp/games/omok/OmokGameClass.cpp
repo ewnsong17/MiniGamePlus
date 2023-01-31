@@ -105,10 +105,10 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 			//양 플레이어 동시 검색 가능하므로 동시 검색
 			for (int turn = 0; turn < player_size; turn++)
 			{
-				//위치당 한쪽이상 안막힌 2개가 있는지 검색
+				//각 턴의 바둑알 검색
 				if (pos_list[i]->bClick == turn)
 				{
-					//2번째 위치도 안막혔는지 체크
+					//다음 위치도 안막혔는지 체크
 					if (pos_list[(long long)i + 21]->bClick == turn)
 					{
 						//3번째 위치도 안막혔는지 체크
@@ -124,12 +124,14 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 									if (pos_list[(long long)i - 21]->bClick == CLICK_NONE)
 									{
 										index = i - 21;
+										break;
 									}
 								}
 
 								if (pos_list[(long long)i + 84]->bClick == CLICK_NONE)
 								{
 									index = i + 84;
+									break;
 								}
 							}
 							else if (pos_list[(long long)i + 63]->bClick == CLICK_NONE)
@@ -184,12 +186,14 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 									if (pos_list[(long long)i - 1]->bClick == CLICK_NONE)
 									{
 										index = i - 1;
+										break;
 									}
 								}
 
 								if (pos_list[(long long)i + 4]->bClick == CLICK_NONE)
 								{
 									index = i + 4;
+									break;
 								}
 							}
 							else if (pos_list[(long long)i + 3]->bClick == CLICK_NONE)
@@ -201,6 +205,7 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 						else if (turn == player_turn && pos_list[(long long)i + 2]->bClick == CLICK_NONE)
 						{
 							index = i + 2;
+							break;
 						}
 					}
 					else if (pos_list[(long long)i + 1]->bClick == CLICK_NONE)
@@ -235,12 +240,14 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 									if (pos_list[(long long)i - 22]->bClick == CLICK_NONE)
 									{
 										index = i - 22;
+										break;
 									}
 								}
 
 								if (pos_list[(long long)i + 88]->bClick == CLICK_NONE)
 								{
 									index = i + 88;
+									break;
 								}
 							}
 							else if (pos_list[(long long)i + 66]->bClick == CLICK_NONE)
@@ -252,6 +259,7 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 						else if (turn == player_turn && pos_list[(long long)i + 44]->bClick == CLICK_NONE)
 						{
 							index = i + 44;
+							break;
 						}
 					}
 					else if (pos_list[(long long)i + 22]->bClick == CLICK_NONE)
@@ -286,11 +294,13 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 								if (pos_list[(long long)i + 20]->bClick == CLICK_NONE)
 								{
 									index = i + 20;
+									break;
 								}
 
 								if (pos_list[(long long)i - 80]->bClick == CLICK_NONE)
 								{
 									index = i - 80;
+									break;
 								}
 							}
 							else if (pos_list[(long long)i - 60]->bClick == CLICK_NONE)
@@ -302,6 +312,7 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 						else if (turn == player_turn && pos_list[(long long)i - 40]->bClick == CLICK_NONE)
 						{
 							index = i - 40;
+							break;
 						}
 					}
 					else if (pos_list[(long long)i - 20]->bClick == CLICK_NONE)

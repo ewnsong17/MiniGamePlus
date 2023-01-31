@@ -70,7 +70,7 @@ VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM
 			break;
 		case IDC_GAME_YUT:
 			m_stageCnt = YUT_GAME;
-//			m_Game = new YutGameClass(2);
+			m_Game = new YutGameClass(2);
 			InvalidateRect(hWnd, nullptr, TRUE);
 			break;
 		case IDC_GAME_OMOK:

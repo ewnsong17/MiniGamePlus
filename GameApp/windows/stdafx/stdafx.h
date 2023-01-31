@@ -60,6 +60,7 @@ constexpr unsigned int SELECT_GAME = 1;
 constexpr unsigned int CARD_GAME = 100;
 constexpr unsigned int CARD_GAME_END = 101;
 constexpr unsigned int YUT_GAME = 200;
+constexpr unsigned int YUT_GAME_END = 201;
 constexpr unsigned int OMOK_GAME = 300;
 constexpr unsigned int OMOK_GAME_END = 301;
 

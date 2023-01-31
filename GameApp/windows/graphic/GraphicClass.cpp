@@ -142,7 +142,7 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 				OnCardGameInit(hWnd, m_stageCnt == CARD_GAME_END, (CardGameClass*) game);
 				break;
 			case YUT_GAME:
-				this->OnRenderImage(hWnd, L"image\\main_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+				OnYutGameInit(hWnd, m_stageCnt == YUT_GAME_END, (YutGameClass*) game);
 				break;
 			case OMOK_GAME:
 			case OMOK_GAME_END:
@@ -152,6 +152,56 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 	}
 
 	EndPaint(hWnd, &ps);
+}
+
+VOID GraphicClass::OnYutGameInit(HWND hWnd, BOOL bGameEnd, YutGameClass* game)
+{
+	ID2D1Bitmap* bitmap;
+	D2D1_POINT_2F ltSize;
+
+	D2D1_SIZE_F rtSize;
+	std::wstring text;
+
+	HRESULT hr = CreateDeviceResources(hWnd);
+
+	//그리기 모드 시작
+	if (SUCCEEDED(hr))
+	{
+		m_pRenderTarget->BeginDraw();
+		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+
+		//배경화면 이미지 로딩
+		hr = LoadBitmapFromFile(L"image\\game_yut_back.png", &bitmap);
+
+		if (SUCCEEDED(hr))
+		{
+			//배경화면 그리기
+			ltSize = D2D1::Point2F(581.f, 579.f);
+
+			m_pRenderTarget->DrawBitmap(
+				bitmap,
+				D2D1::RectF(-30.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT),
+				1.f
+			);
+		}
+
+		//float marginX = 175.f;
+		//float marginY = 60.f;
+		//float length = 600.f;
+
+		//D2D1_RECT_F rect = D2D1::RectF(150.f, 60.f, 150.f + 600.f, 60.f + 600.f);
+
+		//m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush, 1.5f);
+
+		hr = m_pRenderTarget->EndDraw();
+	}
+
+	if (hr == D2DERR_RECREATE_TARGET)
+	{
+		hr = S_OK;
+		DiscardDeviceResources();
+	}
 }
 
 VOID GraphicClass::OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game)
