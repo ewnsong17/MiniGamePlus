@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "inputclass.h"
-#include <card/CardGameClass.h>
 
 void InputClass::Initialize()
 {
@@ -41,12 +40,8 @@ void InputClass::MouseUp(HWND hWnd, unsigned int input, unsigned int pos, IGame*
 	int xPos = LOWORD(pos);
 	int yPos = HIWORD(pos);
 
-	//원카드 처리
-	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(game))
+	if (game != nullptr)
 	{
-		if (cardGame != nullptr)
-		{
-			cardGame->GetMouseClick(hWnd, xPos, yPos);
-		}
+		game->GetMouseClick(hWnd, xPos, yPos);
 	}
 }

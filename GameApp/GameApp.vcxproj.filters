@@ -36,6 +36,9 @@
     <ClInclude Include="games\card\CardGameClass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="games\omok\OmokGameClass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="windows\stdafx\stdafx.cpp">
@@ -60,6 +63,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="games\card\CardGameClass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="games\omok\OmokGameClass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

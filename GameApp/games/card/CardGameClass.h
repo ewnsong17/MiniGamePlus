@@ -46,7 +46,7 @@ public:
 
 	VOID GetCardFromGraves(int ownerID);
 
-	VOID SetNextTurn(HWND hWnd);
+	virtual VOID SetNextTurn(HWND hWnd);
 
 	std::vector<Card*> GetPlayerCards(int index);
 
@@ -54,9 +54,9 @@ public:
 
 	BOOL IsAllowToUse(Card* card);
 
-	VOID GetMouseClick(HWND hWnd, INT xPos, INT yPos);
+	virtual VOID GetMouseClick(HWND hWnd, INT xPos, INT yPos);
 
-	VOID TurnCPU(HWND hWnd);
+	virtual VOID TurnCPU(HWND hWnd);
 
 	VOID ShowCardEffect(Card* selectCard);
 

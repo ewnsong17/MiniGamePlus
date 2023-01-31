@@ -13,7 +13,7 @@ BOOL SystemClass::Initialize()
 		return FALSE;
 	}
 
-	HRESULT hr =m_Graphic->CreateDeviceIndependentResources(L"돋움", 26.f);
+	HRESULT hr = m_Graphic->CreateDeviceIndependentResources(L"돋움", 26.f);
 
 	if (SUCCEEDED(hr))
 	{
@@ -298,6 +298,44 @@ VOID SystemClass::CreateButtons(HWND hWnd)
 
 			break;
 		}
+		case OMOK_GAME:
+		{
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"다시하기",
+					WS_CHILD | BS_PUSHBUTTON,
+					814,
+					275,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_GAME_OMOK,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"그만하기",
+					WS_CHILD | BS_PUSHBUTTON,
+					814,
+					345,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_BTN_END,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			break;
+		}
 	}
 }
 
@@ -380,7 +418,7 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 {
 	UINT* timer = &(ApplicationHandle->m_Game->timer);
 
-	while (*timer > 0 && ApplicationHandle->m_stageCnt != CARD_GAME_END)
+	while (*timer > 0)
 	{
 		InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
 		Sleep(1000);
@@ -399,14 +437,12 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 			if (*timer <= 0)
 			{
 				*timer = 3000;
-				ApplicationHandle->m_Game->SetNextTurn(ApplicationHandle->m_hwnd);
+				ApplicationHandle->m_Game->ForceSetNextTurn(ApplicationHandle->m_hwnd);
 			}
 		}
 	}
 
-	ApplicationHandle->m_stageCnt = CARD_GAME_END;
-	ApplicationHandle->ShowButtons();
-	InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
+	ApplicationHandle->EndGame();
 
 	return 0;
 }
@@ -417,4 +453,22 @@ VOID SystemClass::ShowColorButtons(BOOL bShow)
 	{
 		ShowWindow(*iter, bShow ? SW_SHOW : SW_HIDE);
 	}
+}
+
+VOID SystemClass::EndGame()
+{
+	//원카드 처리
+	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(m_Game))
+	{
+		ApplicationHandle->m_stageCnt = CARD_GAME_END;
+	}
+
+	//오목 처리
+	if (OmokGameClass* omokGame = dynamic_cast<OmokGameClass*>(m_Game))
+	{
+		ApplicationHandle->m_stageCnt = OMOK_GAME_END;
+	}
+
+	ApplicationHandle->ShowButtons();
+	InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
 }

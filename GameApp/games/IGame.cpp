@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "IGame.h"
 #include <card/CardGameClass.h>
+#include <omok/OmokGameClass.h>
 
 IGame::IGame()
 {
@@ -32,6 +33,38 @@ VOID IGame::TurnCPU(HWND hWnd)
 			cardGame->TurnCPU(hWnd);
 		}
 	}
+
+	//坷格 贸府
+	if (OmokGameClass* omokGame = dynamic_cast<OmokGameClass*>(this))
+	{
+		if (omokGame != nullptr)
+		{
+			omokGame->TurnCPU(hWnd);
+		}
+	}
+}
+
+VOID IGame::ForceSetNextTurn(HWND hWnd)
+{
+	//盔墨靛 贸府
+	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(this))
+	{
+		if (cardGame != nullptr)
+		{
+			cardGame->GetCardFromGraves(player_turn);
+			cardGame->SetNextTurn(hWnd);
+		}
+	}
+
+	//坷格 贸府
+	if (OmokGameClass* omokGame = dynamic_cast<OmokGameClass*>(this))
+	{
+		if (omokGame != nullptr)
+		{
+			omokGame->SetRandPos();
+			omokGame->SetNextTurn(hWnd);
+		}
+	}
 }
 
 VOID IGame::SetNextTurn(HWND hWnd)
@@ -42,6 +75,36 @@ VOID IGame::SetNextTurn(HWND hWnd)
 		if (cardGame != nullptr)
 		{
 			cardGame->SetNextTurn(hWnd);
+		}
+	}
+
+	//坷格 贸府
+	if (OmokGameClass* omokGame = dynamic_cast<OmokGameClass*>(this))
+	{
+		if (omokGame != nullptr)
+		{
+			omokGame->SetNextTurn(hWnd);
+		}
+	}
+}
+
+VOID IGame::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
+{
+	//盔墨靛 贸府
+	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(this))
+	{
+		if (cardGame != nullptr)
+		{
+			cardGame->GetMouseClick(hWnd, xPos, yPos);
+		}
+	}
+
+	//坷格 贸府
+	if (OmokGameClass* omokGame = dynamic_cast<OmokGameClass*>(this))
+	{
+		if (omokGame != nullptr)
+		{
+			omokGame->GetMouseClick(hWnd, xPos, yPos);
 		}
 	}
 }

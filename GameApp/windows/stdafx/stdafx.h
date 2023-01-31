@@ -56,5 +56,6 @@ constexpr unsigned int CARD_GAME = 100;
 constexpr unsigned int CARD_GAME_END = 101;
 constexpr unsigned int YUT_GAME = 200;
 constexpr unsigned int OMOK_GAME = 300;
+constexpr unsigned int OMOK_GAME_END = 301;
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.

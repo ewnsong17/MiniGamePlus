@@ -6,10 +6,13 @@ GraphicClass::GraphicClass() :
 	m_pDirect2DFactory(nullptr),
 	m_pRenderTarget(nullptr),
 	m_pCornSlikBrush(nullptr),
+	m_pBlackBrush(nullptr),
 	m_pCornflowerBlueBrush(nullptr),
+	m_pYellowBrush(nullptr),
 	m_pIWICFactory(nullptr),
 	m_pDWriteFactory(nullptr),
-	m_pTextFormat(nullptr)
+	m_pTextFormat(nullptr),
+	m_pTextFormat_2(nullptr)
 {}
 
 GraphicClass::~GraphicClass()
@@ -17,10 +20,13 @@ GraphicClass::~GraphicClass()
 	SafeRelease(m_pDirect2DFactory);
 	SafeRelease(m_pRenderTarget);
 	SafeRelease(m_pCornSlikBrush);
+	SafeRelease(m_pBlackBrush);
 	SafeRelease(m_pCornflowerBlueBrush);
+	SafeRelease(m_pYellowBrush);
 	SafeRelease(m_pIWICFactory);
 	SafeRelease(m_pDWriteFactory);
 	SafeRelease(m_pTextFormat);
+	SafeRelease(m_pTextFormat_2);
 }
 
 
@@ -52,8 +58,26 @@ HRESULT GraphicClass::CreateDeviceIndependentResources(LPCWSTR fontName, float f
 
 	if (SUCCEEDED(hr))
 	{
+		hr = m_pDWriteFactory->CreateTextFormat(
+			fontName,
+			nullptr,
+			DWRITE_FONT_WEIGHT_NORMAL,
+			DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			42.f,
+			L"kr",
+			&m_pTextFormat_2
+		);
+	}
+
+
+	if (SUCCEEDED(hr))
+	{
 		m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 		m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_pTextFormat_2->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		m_pTextFormat_2->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	}
 
 	return hr;
@@ -80,7 +104,17 @@ HRESULT GraphicClass::CreateDeviceResources(HWND hWnd)
 
 		if (SUCCEEDED(hr))
 		{
+			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Orange), &m_pBlackBrush);
+		}
+
+		if (SUCCEEDED(hr))
+		{
 			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::CornflowerBlue), &m_pCornflowerBlueBrush);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow), &m_pYellowBrush);
 		}
 	}
 
@@ -118,12 +152,108 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 				this->OnRenderImage(hWnd, L"image\\main_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
 				break;
 			case OMOK_GAME:
-				this->OnRenderImage(hWnd, L"image\\main_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+			case OMOK_GAME_END:
+				OnOmokGameInit(hWnd, m_stageCnt == OMOK_GAME_END, (OmokGameClass*) game);
 				break;
 		}
 	}
 
 	EndPaint(hWnd, &ps);
+}
+
+VOID GraphicClass::OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game)
+{
+	HRESULT hr = CreateDeviceResources(hWnd);
+
+	ID2D1Bitmap* bitmap;
+	D2D1_POINT_2F ltSize;
+
+	D2D1_SIZE_F rtSize;
+	std::wstring text;
+
+	//그리기 모드 시작
+	if (SUCCEEDED(hr))
+	{
+		m_pRenderTarget->BeginDraw();
+		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+
+		//배경화면 이미지 로딩
+		hr = LoadBitmapFromFile(L"image\\main_back.jpg", &bitmap);
+
+		if (SUCCEEDED(hr))
+		{
+			//배경화면 그리기
+			ltSize = D2D1::Point2F(350.f, 275.f);
+
+			m_pRenderTarget->DrawBitmap(
+				bitmap,
+				D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT),
+				1.f
+			);
+		}
+
+		float len = 750.f;
+		float x = 15.f;
+		while (x <= len)
+		{
+			m_pRenderTarget->DrawLine(D2D1::Point2F(x, 0.f), D2D1::Point2F(x, len), m_pYellowBrush, 1.5f);
+			x += 35;
+		}
+
+		float y = 15.f;
+		while (y <= len)
+		{
+			m_pRenderTarget->DrawLine(D2D1::Point2F(0.f, y), D2D1::Point2F(len, y), m_pYellowBrush, 1.5f);
+			y += 35;
+		}
+
+		for (auto iter = game->pos_list.begin(); iter != game->pos_list.end(); iter++)
+		{
+			if ((*iter)->bClick != CLICK_NONE)
+			{
+				text = L"●";
+
+				m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat_2, D2D1::RectF((*iter)->x, (*iter)->y, (*iter)->x, (*iter)->y),
+					(*iter)->bClick == CLICK_WHITE ? m_pCornSlikBrush : m_pBlackBrush);
+			}
+		}
+		
+		//텍스트 그리기
+		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 300.f, 130.f);
+		text = std::to_wstring(game->timer);
+
+		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat_2, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
+		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 285.f, 250.f);
+
+		if (bGameEnd)
+		{
+			text = std::wstring(game->player_vector[game->player_turn].player_name) + L"의 승리입니다!";
+			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+		}
+		else
+		{
+			if (game->player_turn)
+			{
+				text = L"적의 차례입니다.";
+				m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+			}
+			else
+			{
+				text = L"나의 차례입니다.";
+				m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+			}
+		}
+
+		hr = m_pRenderTarget->EndDraw();
+	}
+
+	if (hr == D2DERR_RECREATE_TARGET)
+	{
+		hr = S_OK;
+		DiscardDeviceResources();
+	}
 }
 
 VOID GraphicClass::OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game)
@@ -303,11 +433,11 @@ VOID GraphicClass::OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game)
 
 		if (bGameEnd)
 		{
-			text = std::wstring(game->player_vector.at(game->player_turn).player_name) + L"님의 승리입니다!";
+			text = std::wstring(game->player_vector.at(game->player_turn).player_name) + L"의 승리입니다!";
 		}
 		else
 		{
-			text = std::wstring(game->player_vector.at(game->player_turn).player_name) + L"님의 차례입니다.";
+			text = std::wstring(game->player_vector.at(game->player_turn).player_name) + L"의 차례입니다.";
 		}
 
 		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);

@@ -27,6 +27,8 @@ private:
 	VOID InitializeWindows();
 	VOID ShutdownWindows();
 
+	VOID EndGame();
+
 private:
 	LPCWSTR m_applicationName = L"미니게임마스터";
 	UINT m_stageCnt = 0;

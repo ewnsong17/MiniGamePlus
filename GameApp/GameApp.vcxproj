@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="games\card\CardGameClass.h" />
     <ClInclude Include="games\IGame.h" />
+    <ClInclude Include="games\omok\OmokGameClass.h" />
     <ClInclude Include="windows\graphic\GraphicClass.h" />
     <ClInclude Include="windows\input\InputClass.h" />
     <ClInclude Include="windows\stdafx\stdafx.h" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="games\card\CardGameClass.cpp" />
     <ClCompile Include="games\IGame.cpp" />
+    <ClCompile Include="games\omok\OmokGameClass.cpp" />
     <ClCompile Include="windows\graphic\GraphicClass.cpp" />
     <ClCompile Include="windows\input\InputClass.cpp" />
     <ClCompile Include="windows\stdafx\stdafx.cpp">
