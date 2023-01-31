@@ -83,7 +83,6 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 
 	pos_list[100]->bClick = player_turn;
 	pos_list[100 + 23]->bClick = player_turn;
-	pos_list[100 + 46]->bClick = player_turn;
 
 	int index = -1;
 
@@ -97,42 +96,53 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 
 
 		int x_ = i + 88;
-		if (pos_list.size() > x_)
+		if (pos_list.size() > x_ && pos_list[i]->y < 700.f)
 		{
 			//양 플레이어 동시 검색 가능하므로 동시 검색
 			for (int turn = 0; turn < player_size; turn++)
 			{
-				//위치당 한쪽이상 안막힌 3개가 있는지 검색
+				//위치당 한쪽이상 안막힌 2개가 있는지 검색
 				if (pos_list[i]->bClick == turn
 					&& pos_list[(long long)i + 22]->bClick == turn
-					&& pos_list[(long long)i + 44]->bClick == turn
 					)
 				{
-
-					//4번째 위치도 안막혔는지 체크
-					if (pos_list[(long long)i + 66]->bClick == turn)
+					//3번째 위치도 안막혔는지 체크
+					if (pos_list[(long long)i + 44]->bClick == turn)
 					{
-						//1. 4개에서 5개가 가능하면 제일 먼저 한다.
-						//2. 상대의 4개를 무조건 막는다.
-						if (i - 22 >= 0)
+
+						//4번째 위치도 안막혔는지 체크
+						if (pos_list[(long long)i + 66]->bClick == turn)
 						{
-							if (pos_list[(long long)i - 22]->bClick == CLICK_NONE)
+							//1. 4개에서 5개가 가능하면 제일 먼저 한다.
+							//2. 상대의 4개를 무조건 막는다.
+							if (i - 22 >= 0)
 							{
-								index = i - 22;
+								if (pos_list[(long long)i - 22]->bClick == CLICK_NONE)
+								{
+									index = i - 22;
+								}
+							}
+
+							if (pos_list[(long long)i + 88]->bClick == CLICK_NONE)
+							{
+								index = i + 88;
 							}
 						}
-
-						if (pos_list[(long long)i + 88]->bClick == CLICK_NONE)
+						else if (pos_list[(long long)i + 66]->bClick == CLICK_NONE)
 						{
-							index = i + 88;
+							//3. 내 양쪽 안막힌 3개를 잇는다.
+							//4. 내 한쪽 안막힌 3개를 잇는다.
+							//5. 상대 양쪽 안막힌 3개를 막는다.
+							//6. 상대 한쪽 안막힌 3개를 막는다.
+
+							index = i + 66;
+							break;
 						}
 					}
-					else
+					else if (turn == player_turn && pos_list[(long long)i + 44]->bClick == CLICK_NONE)
 					{
-						//3. 내 양쪽 안막힌 3개를 잇는다.
-						//4. 내 한쪽 안막힌 3개를 잇는다.
-
-						index = i + 66;
+						//7. 내 양쪽 안막힌 2개를 잇는다.
+						index = i + 44;
 						break;
 					}
 				}
@@ -151,29 +161,35 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 			{
 				if (pos_list[i]->bClick == turn
 					&& pos_list[(long long)i + 1]->bClick == turn
-					&& pos_list[(long long)i + 2]->bClick == turn
 					)
 				{
-					if (pos_list[(long long)i + 3]->bClick == turn)
+					if (pos_list[(long long)i + 2]->bClick == turn)
 					{
-
-						if (i - 1 >= 0)
+						if (pos_list[(long long)i + 3]->bClick == turn)
 						{
-							if (pos_list[(long long)i - 1]->bClick == CLICK_NONE)
+
+							if (i - 1 >= 0)
 							{
-								index = i - 1;
+								if (pos_list[(long long)i - 1]->bClick == CLICK_NONE)
+								{
+									index = i - 1;
+								}
+							}
+
+							if (pos_list[(long long)i + 4]->bClick == CLICK_NONE)
+							{
+								index = i + 4;
 							}
 						}
-
-						if (pos_list[(long long)i + 4]->bClick == CLICK_NONE)
+						else if (pos_list[(long long)i + 3]->bClick == CLICK_NONE)
 						{
-							index = i + 4;
+							index = i + 3;
+							break;
 						}
 					}
-					else
+					else if (turn == player_turn && pos_list[(long long)i + 2]->bClick == CLICK_NONE)
 					{
-						index = i + 3;
-						break;
+						index = i + 2;
 					}
 				}
 
@@ -185,34 +201,40 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 		}
 
 		int rb = i + 92;
-		if (pos_list.size() > rb)
+		if (pos_list.size() > rb && pos_list[i]->y < 700.f)
 		{
 			for (int turn = 0; turn < player_size; turn++)
 			{
 				if (pos_list[i]->bClick == turn
 					&& pos_list[(long long)i + 23]->bClick == turn
-					&& pos_list[(long long)i + 46]->bClick == turn
 					)
 				{
-					if (pos_list[(long long)i + 69]->bClick == turn)
+					if (pos_list[(long long)i + 46]->bClick == turn)
 					{
-						if (i - 23 >= 0)
+						if (pos_list[(long long)i + 69]->bClick == turn)
 						{
-							if (pos_list[(long long)i - 23]->bClick == CLICK_NONE)
+							if (i - 23 >= 0)
 							{
-								index = i - 23;
+								if (pos_list[(long long)i - 23]->bClick == CLICK_NONE)
+								{
+									index = i - 23;
+								}
+							}
+
+							if (pos_list[(long long)i + 92]->bClick == CLICK_NONE)
+							{
+								index = i + 92;
 							}
 						}
-
-						if (pos_list[(long long)i + 92]->bClick == CLICK_NONE)
+						else if (pos_list[(long long)i + 69]->bClick == CLICK_NONE)
 						{
-							index = i + 92;
+							index = i + 69;
+							break;
 						}
 					}
-					else
+					else if (turn == player_turn && pos_list[(long long)i + 46]->bClick == CLICK_NONE)
 					{
-						index = i + 69;
-						break;
+						index = i + 46;
 					}
 				}
 
@@ -226,32 +248,38 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 
 		int lb = i + 21;
 		int lb2 = i - 84;
-		if (lb2 >= 0 && pos_list.size() > lb)
+		if (lb2 >= 0 && pos_list.size() > lb && pos_list[i]->y < 700.f)
 		{
 			for (int turn = 0; turn < player_size; turn++)
 			{
 				if (pos_list[i]->bClick == turn
 					&& pos_list[(long long)i - 21]->bClick == turn
-					&& pos_list[(long long)i - 42]->bClick == turn
 					)
 				{
-
-					if (pos_list[(long long)i - 63]->bClick == turn)
+					if (pos_list[(long long)i - 42]->bClick == turn)
 					{
-						if (pos_list[(long long)i + 21]->bClick == CLICK_NONE)
-						{
-							index = i + 21;
-						}
 
-						if (pos_list[(long long)i - 84]->bClick == CLICK_NONE)
+						if (pos_list[(long long)i - 63]->bClick == turn)
 						{
-							index = i - 84;
+							if (pos_list[(long long)i + 21]->bClick == CLICK_NONE)
+							{
+								index = i + 21;
+							}
+
+							if (pos_list[(long long)i - 84]->bClick == CLICK_NONE)
+							{
+								index = i - 84;
+							}
+						}
+						else if (pos_list[(long long)i - 63]->bClick == CLICK_NONE)
+						{
+							index = i - 63;
+							break;
 						}
 					}
-					else
+					else if (turn == player_turn && pos_list[(long long)i - 42]->bClick == CLICK_NONE)
 					{
-						index = i - 63;
-						break;
+						index = i - 42;
 					}
 				}
 
@@ -263,10 +291,6 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 		}
 	}
 
-	//5. 상대 양쪽 안막힌 3개를 막는다.
-	//6. 상대 한쪽 안막힌 3개를 막는다.
-	//7. 내 양쪽 안막힌 2개를 잇는다.
-	//8. 내 돌 옆에 놓는다.
 
 	std::cout << "index : " << index << '\n';
 
@@ -276,7 +300,7 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 	}
 	else
 	{
-		//9. 아무데나 놓는다.
+		//8. 내 돌 옆에 놓는다.
 		SetRandPos();
 	}
 
@@ -304,7 +328,7 @@ BOOL OmokGameClass::CheckFinish(int player)
 	for (int i = 0; i < pos_list.size(); i++)
 	{
 		int x_ = i + 88;
-		if (pos_list.size() > x_)
+		if (pos_list.size() > x_ && pos_list[i]->y < 700.f)
 		{
 			if (pos_list[i]->bClick == player
 				&& pos_list[(long long)i + 22]->bClick == player
@@ -330,7 +354,7 @@ BOOL OmokGameClass::CheckFinish(int player)
 		}
 
 		int rb = i + 92;
-		if (pos_list.size() > rb)
+		if (pos_list.size() > rb && pos_list[i]->y < 700.f)
 		{
 			if (pos_list[i]->bClick == player
 				&& pos_list[(long long)i + 23]->bClick == player
@@ -344,7 +368,7 @@ BOOL OmokGameClass::CheckFinish(int player)
 
 
 		int lb = i - 84;
-		if (pos_list.size() > lb)
+		if (pos_list.size() > lb && pos_list[i]->y < 700.f)
 		{
 			if (pos_list[i]->bClick == player
 				&& pos_list[(long long)i - 21]->bClick == player
