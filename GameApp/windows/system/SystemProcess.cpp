@@ -11,6 +11,8 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 		case WM_PAINT:
 			m_Graphic->OnRender(hWnd, m_stageCnt, m_Game);
 			break;
+		case WM_ERASEBKGND:
+			break;
 		case WM_SIZE:
 			m_Graphic->OnResize(LOWORD(lParam), HIWORD(lParam));
 			break;
@@ -19,6 +21,9 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 			break;
 		case WM_KEYUP:
 			m_Input->KeyUp((unsigned int)wParam);
+			break;
+		case WM_LBUTTONUP:
+			m_Input->MouseUp(hWnd, (unsigned int)wParam, (unsigned int)lParam, m_Game);
 			break;
 		case WM_COMMAND:
 			CommandHandler(hWnd, uMessage, wParam, lParam);

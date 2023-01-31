@@ -18,6 +18,7 @@ public:
 	UINT color;
 	UINT number;
 	INT owner = CARD_DECK;
+	D2D1_RECT_F rect{};
 
 	Card(UINT _color, UINT _number) :
 		color(_color),
@@ -37,4 +38,6 @@ public:
 	std::vector<Card*> GetPlayerCards(int index);
 
 	std::wstring GetCardImage(Card* card);
+
+	BOOL IsAllowToUse(Card* card);
 };

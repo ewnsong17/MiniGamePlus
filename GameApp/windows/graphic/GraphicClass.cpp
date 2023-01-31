@@ -111,7 +111,6 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 		switch (m_stageCnt)
 		{
 			case CARD_GAME:
-				this->OnRenderImage(hWnd, L"image\\main_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
 				OnCardGameInit(hWnd, (CardGameClass*) game);
 				break;
 			case YUT_GAME:
@@ -128,114 +127,188 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 
 VOID GraphicClass::OnCardGameInit(HWND hWnd, CardGameClass* game)
 {
-	//턴 계산
-	if (game->player_turn == 0)
-	{
-		this->OnRenderText(hWnd, L"당신의 차례입니다.", D2D1::SizeF(SCREEN_WIDTH, 350.f), m_pCornSlikBrush);
-	}
-	else
-	{
-		std::wstring str = std::to_wstring(game->player_turn) + L"님의 차례입니다.";
-		this->OnRenderText(hWnd, str.c_str(), D2D1::SizeF(SCREEN_WIDTH, 350.f), m_pCornSlikBrush);
-	}
-
-
-	this->OnRenderText(hWnd, std::to_wstring(game->timer).c_str(), D2D1::SizeF(SCREEN_WIDTH - 20.f, 430.f), m_pCornSlikBrush);
 
 	D2D1_POINT_2F ltSize;
 	D2D1_POINT_2F imageCenter;
 
-	//무덤 그려주기
-	ltSize = D2D1::Point2F(350.f, 275.f);
+	ID2D1Bitmap* bitmap;
 
-	this->OnRenderImage(hWnd, L"image\\Card\\back.png", D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + (0.66f * CARD_WIDTH), ltSize.y + (0.66f * CARD_HEIGHT)), FALSE);
+	D2D1_SIZE_F rtSize;
+	std::wstring text;
 
-
-
-	//다음 카드 그려주기
-	Card* next_card = game->GetNextCard();
-	
-	ltSize = D2D1::Point2F(450.f, 250.f);
-
-	this->OnRenderImage(hWnd, game->GetCardImage(next_card).c_str(), D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y + CARD_HEIGHT), FALSE);
-
-
-	//카드 그림 그려주기
 	std::vector<Card*> card_list;
 
-	//TODO::추후 배열로 변환, 각도 전환이 어려워서 우선 하드코딩 처리
+	HRESULT hr = CreateDeviceResources(hWnd);
 
-	//내꺼 그려주기
-	card_list = game->GetPlayerCards(0);
-
-	for (int i = 0; i < card_list.size(); i++)
+	//그리기 모드 시작
+	if (SUCCEEDED(hr))
 	{
-		ltSize = D2D1::Point2F(350.f + (i * 30), 620.f);
+		m_pRenderTarget->BeginDraw();
+		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+		m_pRenderTarget->Clear();
 
-		this->OnRenderImage(hWnd, game->GetCardImage(card_list[i]).c_str(), D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y + CARD_HEIGHT), FALSE);
+		//배경화면 이미지 로딩
+		hr = LoadBitmapFromFile(L"image\\main_back.jpg", &bitmap);
+
+		if (SUCCEEDED(hr))
+		{
+			//배경화면 그리기
+			ltSize = D2D1::Point2F(350.f, 275.f);
+
+			m_pRenderTarget->DrawBitmap(
+				bitmap,
+				D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT),
+				1.f
+			);
+		}
+
+		//내 카드리스트 그려주기
+		card_list = game->GetPlayerCards(0);
+
+		for (int i = 0; i < card_list.size(); i++)
+		{
+			//카드 이미지 각각 로딩
+			hr = LoadBitmapFromFile(game->GetCardImage(card_list[i]).c_str(), &bitmap);
+
+			if (SUCCEEDED(hr))
+			{
+				ltSize = D2D1::Point2F(350.f + (i * 30), 620.f);
+
+				D2D1_RECT_F rect = D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y + CARD_HEIGHT);
+
+				card_list[i]->rect = rect;
+
+				m_pRenderTarget->DrawBitmap(
+					bitmap,
+					rect,
+					1.f
+				);
+			}
+		}
+
+		Card* next_card = game->GetNextCard();
+
+		//다음 카드 로딩
+		hr = LoadBitmapFromFile(game->GetCardImage(next_card).c_str(), &bitmap);
+
+		if (SUCCEEDED(hr))
+		{
+			//다음 카드 그려주기
+
+			ltSize = D2D1::Point2F(450.f, 250.f);
+
+			m_pRenderTarget->DrawBitmap(
+				bitmap,
+				D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y + CARD_HEIGHT),
+				1.f
+			);
+		}
+
+		//뒷면 카드 로딩
+		hr = LoadBitmapFromFile(L"image\\Card\\back.png", &bitmap);
+
+		if (SUCCEEDED(hr))
+		{
+			//무덤 그려주기
+			ltSize = D2D1::Point2F(350.f, 275.f);
+
+			m_pRenderTarget->DrawBitmap(
+				bitmap,
+				D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + (0.66f * CARD_WIDTH), ltSize.y + (0.66f * CARD_HEIGHT)),
+				1.f
+			);
+
+			//왼쪽 플레이어
+			card_list = game->GetPlayerCards(1);
+
+			ltSize = D2D1::Point2F(150.f, 210.f);
+			imageCenter = D2D1::Point2F(
+				ltSize.x + CARD_WIDTH / 2,
+				ltSize.y + CARD_HEIGHT / 2
+			);
+
+			m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-90, imageCenter));
+
+			for (int i = 0; i < card_list.size(); i++)
+			{
+				ltSize.x -= 30;
+
+				m_pRenderTarget->DrawBitmap(
+					bitmap,
+					D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT),
+					1.f
+				);
+			}
+
+			//위쪽 플레이어
+			card_list = game->GetPlayerCards(2);
+
+			ltSize = D2D1::Point2F(450.f, 110.f);
+			imageCenter = D2D1::Point2F(
+				ltSize.x + CARD_WIDTH / 2,
+				ltSize.y + CARD_HEIGHT / 2
+			);
+
+			m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-360, imageCenter));
+
+			for (int i = 0; i < card_list.size(); i++)
+			{
+				ltSize.x -= 30;
+
+				m_pRenderTarget->DrawBitmap(
+					bitmap,
+					D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT),
+					1.f
+				);
+			}
+
+			//왼쪽 플레이어
+			card_list = game->GetPlayerCards(3);
+
+			ltSize = D2D1::Point2F(1040.f, 150.f);
+			imageCenter = D2D1::Point2F(
+				ltSize.x + CARD_WIDTH / 2,
+				ltSize.y + CARD_HEIGHT / 2
+			);
+
+			m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-90, imageCenter));
+
+			for (int i = 0; i < card_list.size(); i++)
+			{
+				ltSize.x -= 30;
+
+				m_pRenderTarget->DrawBitmap(
+					bitmap,
+					D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT),
+					1.f
+				);
+			}
+		}
+
+		//글씨 그리기 전 각도 초기화
+		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+
+		//글씨들 전부 그리기
+		rtSize = D2D1::SizeF(SCREEN_WIDTH, 350.f);
+
+		text = std::wstring(game->player_vector[game->player_turn].player_name) + L"님의 차례입니다.";
+
+		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
+
+		rtSize = D2D1::SizeF(SCREEN_WIDTH - 20.f, 430.f);
+		text = std::to_wstring(game->timer);
+
+		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
+		hr = m_pRenderTarget->EndDraw();
 	}
 
-
-
-	//왼쪽 플레이어
-	card_list = game->GetPlayerCards(1);
-
-	ltSize = D2D1::Point2F(150.f, 210.f);
-	imageCenter = D2D1::Point2F(
-		ltSize.x + CARD_WIDTH / 2,
-		ltSize.y + CARD_HEIGHT / 2
-	);
-
-	m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-90, imageCenter));
-
-	for (int i = 0; i < card_list.size(); i++)
+	if (hr == D2DERR_RECREATE_TARGET)
 	{
-		ltSize.x -= 30;
-
-		this->OnRenderImage(hWnd, L"image\\Card\\back.png", D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT), FALSE);
+		hr = S_OK;
+		DiscardDeviceResources();
 	}
-
-
-
-	//위쪽 플레이어
-	card_list = game->GetPlayerCards(2);
-
-	ltSize = D2D1::Point2F(450.f, 110.f);
-	imageCenter = D2D1::Point2F(
-		ltSize.x + CARD_WIDTH / 2,
-		ltSize.y + CARD_HEIGHT / 2
-	);
-
-	m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-360, imageCenter));
-
-	for (int i = 0; i < card_list.size(); i++)
-	{
-		ltSize.x -= 30;
-		this->OnRenderImage(hWnd, L"image\\Card\\back.png", D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT), FALSE);
-	}
-
-
-
-	//왼쪽 플레이어
-	card_list = game->GetPlayerCards(3);
-
-	ltSize = D2D1::Point2F(1040.f, 150.f);
-	imageCenter = D2D1::Point2F(
-		ltSize.x + CARD_WIDTH / 2,
-		ltSize.y + CARD_HEIGHT / 2
-	);
-
-	m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(-90, imageCenter));
-
-	for (int i = 0; i < card_list.size(); i++)
-	{
-		ltSize.x -= 30;
-		this->OnRenderImage(hWnd, L"image\\Card\\back.png", D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + CARD_WIDTH, ltSize.y - CARD_HEIGHT), FALSE);
-	}
-
-
-	//각도 초기화
-	m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 }
 
 HRESULT GraphicClass::OnRenderImage(HWND hWnd, LPCWSTR uri, D2D1_RECT_F rtSize, BOOL bReset)

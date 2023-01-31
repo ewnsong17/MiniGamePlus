@@ -49,6 +49,7 @@ constexpr int SCREEN_HEIGHT = 768;
 constexpr unsigned int START_GAME = 0;
 constexpr unsigned int SELECT_GAME = 1;
 constexpr unsigned int CARD_GAME = 100;
+constexpr unsigned int CARD_GAME_1 = 101;
 constexpr unsigned int YUT_GAME = 200;
 constexpr unsigned int OMOK_GAME = 300;
 

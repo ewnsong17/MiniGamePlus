@@ -264,16 +264,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 
 DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 {
-	UINT timer = ApplicationHandle->m_Game->timer;
+	UINT* timer = &(ApplicationHandle->m_Game->timer);
 
-	while (timer > 0)
+	while (*timer > 0)
 	{
-		InvalidateRect(ApplicationHandle->m_hwnd, new RECT{ SCREEN_WIDTH - 20, 430, 100, 100 }, TRUE);
+		InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
 		Sleep(1000);
 		
-		ApplicationHandle->m_Game->timer = timer - 1;
-		timer = ApplicationHandle->m_Game->timer;
-		std::cout << "time : " << ApplicationHandle->m_Game->timer << '\n';
+		(*timer)--;
 	}
 	return 0;
 }

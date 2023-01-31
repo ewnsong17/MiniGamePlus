@@ -17,4 +17,6 @@ public:
 	IGame();
 
 	UINT timer = 30;
+
+	virtual VOID SetPlayerDead();
 };

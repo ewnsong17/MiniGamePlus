@@ -20,3 +20,8 @@ IGame::IGame()
 	//항상 맨 앞에 있는 플레이어 부터 시작함.
 	player_turn = 0;
 }
+
+VOID IGame::SetPlayerDead()
+{
+
+}

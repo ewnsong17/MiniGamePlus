@@ -104,7 +104,28 @@ std::wstring CardGameClass::GetCardImage(Card* card)
 
 	std::wstring w_str = L"image\\Card\\" + color_str + L"\\" + num_str + L".jpg";
 
-	std::wcout << w_str << '\n';
+//	std::wcout << w_str << '\n';
 
 	return w_str;
+}
+
+BOOL CardGameClass::IsAllowToUse(Card* card)
+{
+	Card* next_card = GetNextCard();
+
+	if (next_card != nullptr)
+	{
+		//같은 번호일 경우 무조건 OK
+		if (next_card->number == card->number)
+		{
+			return TRUE;
+		}
+
+		//같은 색일 경우도 OK
+		if (next_card->color == card->color)
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
