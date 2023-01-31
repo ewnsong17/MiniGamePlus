@@ -8,7 +8,6 @@ GraphicClass::GraphicClass() :
 	m_pCornSlikBrush(nullptr),
 	m_pBlackBrush(nullptr),
 	m_pCornflowerBlueBrush(nullptr),
-	m_pYellowBrush(nullptr),
 	m_pIWICFactory(nullptr),
 	m_pDWriteFactory(nullptr),
 	m_pTextFormat(nullptr),
@@ -22,7 +21,6 @@ GraphicClass::~GraphicClass()
 	SafeRelease(m_pCornSlikBrush);
 	SafeRelease(m_pBlackBrush);
 	SafeRelease(m_pCornflowerBlueBrush);
-	SafeRelease(m_pYellowBrush);
 	SafeRelease(m_pIWICFactory);
 	SafeRelease(m_pDWriteFactory);
 	SafeRelease(m_pTextFormat);
@@ -104,17 +102,12 @@ HRESULT GraphicClass::CreateDeviceResources(HWND hWnd)
 
 		if (SUCCEEDED(hr))
 		{
-			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Orange), &m_pBlackBrush);
+			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(0x202020), &m_pBlackBrush);
 		}
 
 		if (SUCCEEDED(hr))
 		{
 			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::CornflowerBlue), &m_pCornflowerBlueBrush);
-		}
-
-		if (SUCCEEDED(hr))
-		{
-			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow), &m_pYellowBrush);
 		}
 	}
 
@@ -130,12 +123,12 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 	switch (m_stageCnt)
 	{
 		case START_GAME:
-			this->OnRenderImage(hWnd, L"image\\game_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
-			this->OnRenderText(hWnd, L"미니게임마스터!", D2D1::SizeF(SCREEN_WIDTH, 200.f), m_pCornflowerBlueBrush);
+			this->OnRenderImage(hWnd, L"image\\game_title.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+//			this->OnRenderText(hWnd, L"미니게임마스터!", D2D1::SizeF(SCREEN_WIDTH, 200.f), m_pCornflowerBlueBrush);
 			break;
 		case SELECT_GAME:
-			this->OnRenderImage(hWnd, L"image\\game_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
-			this->OnRenderText(hWnd, L"원하시는 게임을 선택해주세요.", D2D1::SizeF(SCREEN_WIDTH, 200.f), m_pCornflowerBlueBrush);
+			this->OnRenderImage(hWnd, L"image\\game_title.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
+			this->OnRenderText(hWnd, L"원하시는 게임을 선택해주세요.", D2D1::SizeF(SCREEN_WIDTH, 200.f), m_pBlackBrush);
 			break;
 	}
 
@@ -179,7 +172,7 @@ VOID GraphicClass::OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game)
 		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
 		//배경화면 이미지 로딩
-		hr = LoadBitmapFromFile(L"image\\main_back.jpg", &bitmap);
+		hr = LoadBitmapFromFile(L"image\\game_omok_back.jpg", &bitmap);
 
 		if (SUCCEEDED(hr))
 		{
@@ -197,14 +190,14 @@ VOID GraphicClass::OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game)
 		float x = 15.f;
 		while (x <= len)
 		{
-			m_pRenderTarget->DrawLine(D2D1::Point2F(x, 0.f), D2D1::Point2F(x, len), m_pYellowBrush, 1.5f);
+			m_pRenderTarget->DrawLine(D2D1::Point2F(x, 0.f), D2D1::Point2F(x, len), m_pCornSlikBrush, 1.5f);
 			x += 35;
 		}
 
 		float y = 15.f;
-		while (y <= len)
+		while (y < len)
 		{
-			m_pRenderTarget->DrawLine(D2D1::Point2F(0.f, y), D2D1::Point2F(len, y), m_pYellowBrush, 1.5f);
+			m_pRenderTarget->DrawLine(D2D1::Point2F(0.f, y), D2D1::Point2F(len, y), m_pCornSlikBrush, 1.5f);
 			y += 35;
 		}
 
@@ -281,7 +274,7 @@ VOID GraphicClass::OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game)
 		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
 		//배경화면 이미지 로딩
-		hr = LoadBitmapFromFile(L"image\\main_back.jpg", &bitmap);
+		hr = LoadBitmapFromFile(L"image\\game_card_back.jpg", &bitmap);
 
 		if (SUCCEEDED(hr))
 		{

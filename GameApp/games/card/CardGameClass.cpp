@@ -277,7 +277,10 @@ VOID CardGameClass::ShowCardEffect(Card* selectCard)
 			}
 			else
 			{
-				FAKE_CARD = new Card(rand() % 4, 7);
+				unsigned int rand;
+				rand_s(&rand);
+
+				FAKE_CARD = new Card(rand % 4, 7);
 			}
 			break;
 		case 11:

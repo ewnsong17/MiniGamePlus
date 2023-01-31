@@ -20,7 +20,10 @@ IGame::IGame()
 	}
 
 	//먼저 시작할 사람 랜덤으로 정하기
-	player_turn = rand() % player_size;
+	unsigned int rand;
+	rand_s(&rand);
+
+	player_turn = rand % player_size;
 }
 
 VOID IGame::TurnCPU(HWND hWnd)

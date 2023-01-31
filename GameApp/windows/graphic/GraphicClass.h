@@ -37,7 +37,6 @@ public:
 		SafeRelease(m_pCornSlikBrush);
 		SafeRelease(m_pBlackBrush);
 		SafeRelease(m_pCornflowerBlueBrush);
-		SafeRelease(m_pYellowBrush);
 	}
 
 private:
@@ -46,7 +45,6 @@ private:
 	ID2D1SolidColorBrush* m_pCornSlikBrush;
 	ID2D1SolidColorBrush* m_pBlackBrush;
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
-	ID2D1SolidColorBrush* m_pYellowBrush;
 
 	IWICImagingFactory* m_pIWICFactory;
 	IDWriteFactory* m_pDWriteFactory;
