@@ -293,15 +293,21 @@ VOID GraphicClass::OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game)
 		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 
 		//±Û¾¾µé ÀüºÎ ±×¸®±â
-		rtSize = D2D1::SizeF(SCREEN_WIDTH, 350.f);
+		rtSize = D2D1::SizeF(SCREEN_WIDTH, 300.f);
+
+		text = game->special_text;
+
+		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
+		rtSize = D2D1::SizeF(SCREEN_WIDTH, 360.f);
 
 		if (bGameEnd)
 		{
-			text = std::wstring(game->player_vector[game->player_turn].player_name) + L"´ÔÀÇ ½Â¸®ÀÔ´Ï´Ù!";
+			text = std::wstring(game->player_vector.at(game->player_turn).player_name) + L"´ÔÀÇ ½Â¸®ÀÔ´Ï´Ù!";
 		}
 		else
 		{
-			text = std::wstring(game->player_vector[game->player_turn].player_name) + L"´ÔÀÇ Â÷·ÊÀÔ´Ï´Ù.";
+			text = std::wstring(game->player_vector.at(game->player_turn).player_name) + L"´ÔÀÇ Â÷·ÊÀÔ´Ï´Ù.";
 		}
 
 		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);

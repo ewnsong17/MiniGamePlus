@@ -11,7 +11,7 @@ class IGame
 public:
 
 	std::vector<IGamePlayer> player_vector;
-	UINT player_turn;
+	INT player_turn;
 	UINT player_size = 4;
 
 	IGame();

@@ -186,6 +186,7 @@ VOID SystemClass::CreateButtons(HWND hWnd)
 		}
 		case CARD_GAME_END:
 		{
+			std::cout << "button create " << '\n';
 			m_EditCtrl.push_back
 			(
 				CreateWindow(
@@ -304,30 +305,35 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 {
 	UINT* timer = &(ApplicationHandle->m_Game->timer);
 
-	while (*timer > 0)
+	while (*timer > 0 && ApplicationHandle->m_stageCnt != CARD_GAME_END)
 	{
 		InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
 		Sleep(1000);
 		
-		(*timer)--;
-
-		//플레이어 턴이 아닌 경우 CPU 처리
-		if (ApplicationHandle->m_Game->player_turn != 0)
+		//2중 조건문 참조
+		if (*timer > 0)
 		{
-			ApplicationHandle->m_Game->TurnCPU(ApplicationHandle->m_hwnd);
-		}
+			(*timer)--;
 
-		if (*timer <= 0)
-		{
-			*timer = 3000;
-			ApplicationHandle->m_Game->SetNextTurn(ApplicationHandle->m_hwnd);
+			//플레이어 턴이 아닌 경우 CPU 처리
+			if (ApplicationHandle->m_Game->player_turn != 0)
+			{
+				ApplicationHandle->m_Game->TurnCPU(ApplicationHandle->m_hwnd);
+			}
+
+			if (*timer <= 0)
+			{
+				*timer = 3000;
+				ApplicationHandle->m_Game->SetNextTurn(ApplicationHandle->m_hwnd);
+			}
 		}
 	}
 
 	ApplicationHandle->m_stageCnt = CARD_GAME_END;
-	InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
 
 	ApplicationHandle->CreateButtons(ApplicationHandle->m_hwnd);
+
+	InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
 
 	return 0;
 }

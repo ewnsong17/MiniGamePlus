@@ -30,7 +30,13 @@ class CardGameClass : public IGame
 {
 public:
 	std::vector<Card*> card_list;
+	std::wstring special_text = L"";
 	D2D1_RECT_F grave_rect{};
+	BOOL BLOCK_TURN_SET = FALSE;
+	BOOL TURN_REVERSE = FALSE;
+	BOOL TURN_JUMP = FALSE;
+	UINT ATTACK_CNT = 0;
+	UINT DEAD_LINE = 15;
 
 	CardGameClass(UINT player_size);
 
@@ -49,6 +55,10 @@ public:
 	VOID GetMouseClick(HWND hWnd, INT xPos, INT yPos);
 
 	VOID TurnCPU(HWND hWnd);
+
+	VOID ShowCardEffect(Card* selectCard);
+
+	VOID PlayerDead(int playerID);
 
 	virtual VOID SetGameEnd(HWND hWnd);
 };

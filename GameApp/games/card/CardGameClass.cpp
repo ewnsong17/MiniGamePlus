@@ -118,19 +118,73 @@ BOOL CardGameClass::IsAllowToUse(Card* card)
 
 	if (next_card != nullptr)
 	{
-		//같은 번호일 경우 무조건 OK
-		if (next_card->number == card->number)
+		if (ATTACK_CNT > 0)
 		{
-			return TRUE;
-		}
+			//공격 상태일 경우
 
-		//같은 색일 경우도 OK
-		if (next_card->color == card->color)
+			//공격 or 수비카드만 가능
+			switch (next_card->number)
+			{
+				case 1:
+				{
+					//같은 A만 가능
+					if (card->number == 1)
+					{
+						return TRUE;
+					}
+					break;
+				}
+				case 2:
+				{
+					//같은 2 혹은 같은 문양의 A만 가능
+					if (card->number == 2 || (card->number == 1 && card->color == next_card->color))
+					{
+						return TRUE;
+					}
+					break;
+				}
+				case 3:
+				{
+					//수비 카드는 같은 색일 경우 OK
+					if (next_card->color == card->color)
+					{
+						return TRUE;
+					}
+					break;
+				}
+			}
+		}
+		else
 		{
-			return TRUE;
+			//공격 상태가 아닐 경우
+			
+			//같은 번호일 경우 무조건 OK
+			if (next_card->number == card->number)
+			{
+				return TRUE;
+			}
+
+			//같은 색일 경우도 OK
+			if (next_card->color == card->color)
+			{
+				return TRUE;
+			}
 		}
 	}
 	return FALSE;
+}
+
+VOID CardGameClass::PlayerDead(int playerID)
+{
+	//사망 시 가지고 있는 카드 전부 무덤에 버리기
+	std::vector<Card*> card_list = GetPlayerCards(playerID);
+
+	for (int i = 0; i < card_list.size(); i++)
+	{
+		card_list[i]->owner = CARD_GRAVE;
+	}
+
+	player_vector[playerID].player_alive = FALSE;
 }
 
 VOID CardGameClass::GetCardFromGraves(int ownerID)
@@ -145,13 +199,41 @@ VOID CardGameClass::GetCardFromGraves(int ownerID)
 		}
 	}
 
+	special_text = L"";
+
 //	std::cout << "click grave " << card_graves.size()  << '\n';
 
 	if (card_graves.size() > 0)
 	{
 		std::random_shuffle(card_graves.begin(), card_graves.end());
 
-		card_graves[0]->owner = ownerID;
+
+		if (ATTACK_CNT > 0)
+		{
+			//TODO::사망 처리
+			if (card_graves.size() < ATTACK_CNT || GetPlayerCards(ownerID).size() + ATTACK_CNT > DEAD_LINE)
+			{
+				PlayerDead(ownerID);
+				return;
+			}
+
+			for (int i = 0; i < ATTACK_CNT; i++)
+			{
+				card_graves[i]->owner = ownerID;
+			}
+
+			ATTACK_CNT = 0;
+		}
+		else
+		{
+			if (card_graves.size() <= 0 || GetPlayerCards(ownerID).size() + 1 >= DEAD_LINE)
+			{
+				PlayerDead(ownerID);
+				return;
+			}
+
+			card_graves[0]->owner = ownerID;
+		}
 
 //		std::cout << "GET : " << card_graves[0]->number << '\n';
 	}
@@ -162,22 +244,84 @@ VOID CardGameClass::SetGameEnd(HWND hWnd)
 	timer = 0;
 }
 
+VOID CardGameClass::ShowCardEffect(Card* selectCard)
+{
+	switch (selectCard->number)
+	{
+		case 1:
+			ATTACK_CNT += selectCard->number == 3 ? 5 : 3; // 스페이드 에이스
+			special_text = L"공격! (" + std::to_wstring(ATTACK_CNT) + L")";
+			break;
+		case 2:
+			ATTACK_CNT += 2;
+			special_text = L"공격! (" + std::to_wstring(ATTACK_CNT) + L")";
+			break;
+		case 3:
+			if (ATTACK_CNT > 0)
+			{
+				special_text = L"수비!";
+			}
+			break;
+		case 11:
+			TURN_JUMP = TRUE;
+			special_text = L"점프!";
+			break;
+		case 12:
+			TURN_REVERSE = !TURN_REVERSE;
+			special_text = L"되돌리기!";
+			break;
+		case 13:
+			BLOCK_TURN_SET = TRUE;
+			special_text = L"한 번 더!";
+			break;
+		default:
+			special_text = L"";
+			break;
+	}
+}
+
 VOID CardGameClass::SetNextTurn(HWND hWnd)
 {
 	//게임 종료 가능 여부 체크
-	if (GetPlayerCards(player_turn).size() <= 0)
+	if (player_vector[player_turn].player_alive && GetPlayerCards(player_turn).size() <= 0)
 	{
 		SetGameEnd(hWnd);
 		return;
 	}
 
 	//턴 바꾸기
-	player_turn++;
-
-	if (player_turn >= player_size)
+	if (!BLOCK_TURN_SET)
 	{
-		player_turn = 0;
+		for (int i = 0; i < (TURN_JUMP ? 2 : 1);)
+		{
+			if (TURN_REVERSE)
+			{
+				player_turn--;
+
+				if (player_turn < 0)
+				{
+					player_turn = player_size - 1;
+				}
+			}
+			else
+			{
+				player_turn++;
+
+				if (player_turn >= player_size)
+				{
+					player_turn = 0;
+				}
+			}
+
+			if (player_vector[player_turn].player_alive)
+			{
+				i++;
+			}
+		}
 	}
+
+	BLOCK_TURN_SET = FALSE;
+	TURN_JUMP = FALSE;
 
 //	std::cout << "next turn : " << player_turn << '\n';
 
@@ -238,6 +382,9 @@ VOID CardGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 				GetNextCard()->owner = CARD_GRAVE;
 				selectCard->owner = CARD_DECK;
 
+				//카드 효과 발동 및 문구 변경
+				ShowCardEffect(selectCard);
+
 				//턴 변경하기
 				SetNextTurn(hWnd);
 			}
@@ -249,6 +396,8 @@ VOID CardGameClass::TurnCPU(HWND hWnd)
 {
 	if (timer > 0)
 	{
+		Sleep(500);
+
 		std::vector<Card*> cpu_cards = GetPlayerCards(player_turn);
 		Card* select_card;
 		for (int i = 0; i < cpu_cards.size(); i++)
@@ -259,6 +408,9 @@ VOID CardGameClass::TurnCPU(HWND hWnd)
 				//카드 지우기
 				GetNextCard()->owner = CARD_GRAVE;
 				select_card->owner = CARD_DECK;
+
+				//카드 효과 발동 및 문구 변경
+				ShowCardEffect(select_card);
 
 				//턴 변경하기
 				SetNextTurn(hWnd);
