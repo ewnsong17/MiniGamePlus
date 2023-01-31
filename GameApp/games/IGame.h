@@ -18,7 +18,7 @@ public:
 
 	UINT timer = 30;
 
-	virtual VOID SetPlayerDead();
-
 	virtual VOID TurnCPU(HWND hWnd);
+
+	virtual VOID SetNextTurn(HWND hWnd);
 };

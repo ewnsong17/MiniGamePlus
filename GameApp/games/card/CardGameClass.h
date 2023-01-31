@@ -49,4 +49,6 @@ public:
 	VOID GetMouseClick(HWND hWnd, INT xPos, INT yPos);
 
 	VOID TurnCPU(HWND hWnd);
+
+	virtual VOID SetGameEnd(HWND hWnd);
 };

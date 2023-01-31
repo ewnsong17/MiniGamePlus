@@ -37,9 +37,11 @@
 //커맨드 관련 변수입니다.
 constexpr int IDC_BTN_START = 1003;
 constexpr int IDC_BTN_END = 1004;
-constexpr int IDC_GAME_CARD = 1005;
-constexpr int IDC_GAME_YUT = 1006;
-constexpr int IDC_GAME_OMOK = 1007;
+constexpr int IDC_GAME_CARD = 1010;
+constexpr int IDC_GAME_CARD_RETRY = 1011;
+constexpr int IDC_GAME_CARD_END = 1012;
+constexpr int IDC_GAME_YUT = 1020;
+constexpr int IDC_GAME_OMOK = 1030;
 
 //해상도 사이즈 입니다.
 constexpr int SCREEN_WIDTH = 1024;
@@ -49,7 +51,7 @@ constexpr int SCREEN_HEIGHT = 768;
 constexpr unsigned int START_GAME = 0;
 constexpr unsigned int SELECT_GAME = 1;
 constexpr unsigned int CARD_GAME = 100;
-constexpr unsigned int CARD_GAME_1 = 101;
+constexpr unsigned int CARD_GAME_END = 101;
 constexpr unsigned int YUT_GAME = 200;
 constexpr unsigned int OMOK_GAME = 300;
 

@@ -50,8 +50,7 @@ VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM
 			break;
 		case IDC_GAME_CARD:
 			m_stageCnt = CARD_GAME;
-			m_Game = new CardGameClass(2);
-
+			m_Game = new CardGameClass(4);
 			InvalidateRect(hWnd, nullptr, TRUE);
 			break;
 		case IDC_GAME_YUT:

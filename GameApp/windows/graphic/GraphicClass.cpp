@@ -111,7 +111,8 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 		switch (m_stageCnt)
 		{
 			case CARD_GAME:
-				OnCardGameInit(hWnd, (CardGameClass*) game);
+			case CARD_GAME_END:
+				OnCardGameInit(hWnd, m_stageCnt == CARD_GAME_END, (CardGameClass*) game);
 				break;
 			case YUT_GAME:
 				this->OnRenderImage(hWnd, L"image\\main_back.jpg", D2D1::RectF(0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT), TRUE);
@@ -125,7 +126,7 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 	EndPaint(hWnd, &ps);
 }
 
-VOID GraphicClass::OnCardGameInit(HWND hWnd, CardGameClass* game)
+VOID GraphicClass::OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game)
 {
 
 	D2D1_POINT_2F ltSize;
@@ -294,15 +295,25 @@ VOID GraphicClass::OnCardGameInit(HWND hWnd, CardGameClass* game)
 		//±Û¾¾µé ÀüºÎ ±×¸®±â
 		rtSize = D2D1::SizeF(SCREEN_WIDTH, 350.f);
 
-		text = std::wstring(game->player_vector[game->player_turn].player_name) + L"´ÔÀÇ Â÷·ÊÀÔ´Ï´Ù.";
+		if (bGameEnd)
+		{
+			text = std::wstring(game->player_vector[game->player_turn].player_name) + L"´ÔÀÇ ½Â¸®ÀÔ´Ï´Ù!";
+		}
+		else
+		{
+			text = std::wstring(game->player_vector[game->player_turn].player_name) + L"´ÔÀÇ Â÷·ÊÀÔ´Ï´Ù.";
+		}
 
 		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
 
 
-		rtSize = D2D1::SizeF(SCREEN_WIDTH - 20.f, 430.f);
-		text = std::to_wstring(game->timer);
+		if (!bGameEnd)
+		{
+			rtSize = D2D1::SizeF(SCREEN_WIDTH - 20.f, 430.f);
+			text = std::to_wstring(game->timer);
 
-		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+		}
 
 		hr = m_pRenderTarget->EndDraw();
 	}

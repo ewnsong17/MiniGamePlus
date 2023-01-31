@@ -22,11 +22,6 @@ IGame::IGame()
 	player_turn = 0;
 }
 
-VOID IGame::SetPlayerDead()
-{
-
-}
-
 VOID IGame::TurnCPU(HWND hWnd)
 {
 	//원카드 처리
@@ -35,6 +30,18 @@ VOID IGame::TurnCPU(HWND hWnd)
 		if (cardGame != nullptr)
 		{
 			cardGame->TurnCPU(hWnd);
+		}
+	}
+}
+
+VOID IGame::SetNextTurn(HWND hWnd)
+{
+	//원카드 처리
+	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(this))
+	{
+		if (cardGame != nullptr)
+		{
+			cardGame->SetNextTurn(hWnd);
 		}
 	}
 }

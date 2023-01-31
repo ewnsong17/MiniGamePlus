@@ -184,6 +184,44 @@ VOID SystemClass::CreateButtons(HWND hWnd)
 
 			break;
 		}
+		case CARD_GAME_END:
+		{
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"다시하기",
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					432,
+					475,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_GAME_CARD_RETRY,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_EditCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"그만하기",
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					594,
+					475,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_GAME_CARD_END,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			break;
+		}
 	}
 }
 
@@ -278,6 +316,18 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 		{
 			ApplicationHandle->m_Game->TurnCPU(ApplicationHandle->m_hwnd);
 		}
+
+		if (*timer <= 0)
+		{
+			*timer = 3000;
+			ApplicationHandle->m_Game->SetNextTurn(ApplicationHandle->m_hwnd);
+		}
 	}
+
+	ApplicationHandle->m_stageCnt = CARD_GAME_END;
+	InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
+
+	ApplicationHandle->CreateButtons(ApplicationHandle->m_hwnd);
+
 	return 0;
 }

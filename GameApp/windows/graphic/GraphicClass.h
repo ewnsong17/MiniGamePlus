@@ -17,7 +17,7 @@ public:
 	HRESULT LoadBitmapFromFile(LPCWSTR uri, ID2D1Bitmap** ppBitmap);
 
 
-	VOID OnCardGameInit(HWND hWnd, CardGameClass* game);
+	VOID OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game);
 
 	template <typename T>
 	inline VOID SafeRelease(T*& p)

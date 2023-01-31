@@ -157,8 +157,20 @@ VOID CardGameClass::GetCardFromGraves(int ownerID)
 	}
 }
 
+VOID CardGameClass::SetGameEnd(HWND hWnd)
+{
+	timer = 0;
+}
+
 VOID CardGameClass::SetNextTurn(HWND hWnd)
 {
+	//게임 종료 가능 여부 체크
+	if (GetPlayerCards(player_turn).size() <= 0)
+	{
+		SetGameEnd(hWnd);
+		return;
+	}
+
 	//턴 바꾸기
 	player_turn++;
 
@@ -166,6 +178,8 @@ VOID CardGameClass::SetNextTurn(HWND hWnd)
 	{
 		player_turn = 0;
 	}
+
+//	std::cout << "next turn : " << player_turn << '\n';
 
 	//타이머 재설정
 	timer = 30;
@@ -175,7 +189,7 @@ VOID CardGameClass::SetNextTurn(HWND hWnd)
 
 VOID CardGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 {
-	if (player_turn == 0)
+	if (timer > 0 && player_turn == 0)
 	{
 
 		//무덤 클릭 시 카드 하나 뽑기
@@ -233,25 +247,26 @@ VOID CardGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 
 VOID CardGameClass::TurnCPU(HWND hWnd)
 {
-	std::vector<Card*> cpu_cards = GetPlayerCards(player_turn);
-	Card* select_card;
-	for (int i = 0; i < cpu_cards.size(); i++)
+	if (timer > 0)
 	{
-		select_card = cpu_cards[i];
-		if (IsAllowToUse(select_card))
+		std::vector<Card*> cpu_cards = GetPlayerCards(player_turn);
+		Card* select_card;
+		for (int i = 0; i < cpu_cards.size(); i++)
 		{
-			//카드 지우기
-			GetNextCard()->owner = CARD_GRAVE;
-			select_card->owner = CARD_DECK;
+			select_card = cpu_cards[i];
+			if (IsAllowToUse(select_card))
+			{
+				//카드 지우기
+				GetNextCard()->owner = CARD_GRAVE;
+				select_card->owner = CARD_DECK;
 
-			//턴 변경하기
-			SetNextTurn(hWnd);
-			return;
+				//턴 변경하기
+				SetNextTurn(hWnd);
+				return;
+			}
 		}
+
+		GetCardFromGraves(player_turn);
+		SetNextTurn(hWnd);
 	}
-
-	GetCardFromGraves(player_turn);
-	SetNextTurn(hWnd);
-
-	Sleep(5000);
 }
