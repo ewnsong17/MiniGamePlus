@@ -42,6 +42,11 @@ CardGameClass::CardGameClass(UINT player_size)
 
 Card* CardGameClass::GetNextCard()
 {
+	if (FAKE_CARD != nullptr)
+	{
+		return FAKE_CARD;
+	}
+
 	for (int i = 0; i < card_list.size(); i++)
 	{
 		if (card_list[i]->owner == CARD_DECK)
@@ -203,7 +208,7 @@ VOID CardGameClass::GetCardFromGraves(int ownerID)
 
 //	std::cout << "click grave " << card_graves.size()  << '\n';
 
-	if (card_graves.size() > 0)
+	if (card_graves.size() > 0 && !SELECT_COLOR)
 	{
 		std::random_shuffle(card_graves.begin(), card_graves.end());
 
@@ -214,6 +219,7 @@ VOID CardGameClass::GetCardFromGraves(int ownerID)
 			if (card_graves.size() < ATTACK_CNT || GetPlayerCards(ownerID).size() + ATTACK_CNT > DEAD_LINE)
 			{
 				PlayerDead(ownerID);
+				ATTACK_CNT = 0;
 				return;
 			}
 
@@ -239,13 +245,14 @@ VOID CardGameClass::GetCardFromGraves(int ownerID)
 	}
 }
 
-VOID CardGameClass::SetGameEnd(HWND hWnd)
+VOID CardGameClass::SetGameEnd()
 {
 	timer = 0;
 }
 
 VOID CardGameClass::ShowCardEffect(Card* selectCard)
 {
+
 	switch (selectCard->number)
 	{
 		case 1:
@@ -260,6 +267,18 @@ VOID CardGameClass::ShowCardEffect(Card* selectCard)
 			if (ATTACK_CNT > 0)
 			{
 				special_text = L"수비!";
+			}
+			break;
+		case 7:
+			if (player_turn == 0)
+			{
+				SELECT_COLOR = TRUE;
+				SystemClass::ShowColorButtons(TRUE);
+			}
+			else
+			{
+				std::cout << "CPU FAKE CARD " << '\n';
+				FAKE_CARD = new Card(rand() % 4, 7);
 			}
 			break;
 		case 11:
@@ -285,12 +304,27 @@ VOID CardGameClass::SetNextTurn(HWND hWnd)
 	//게임 종료 가능 여부 체크
 	if (player_vector[player_turn].player_alive && GetPlayerCards(player_turn).size() <= 0)
 	{
-		SetGameEnd(hWnd);
+		SetGameEnd();
+		return;
+	}
+
+	int alive_cnt = 0;
+	for (int i = 0; i < player_size; i++)
+	{
+		if (player_vector[i].player_alive)
+		{
+			alive_cnt++;
+		}
+	}
+
+	if (alive_cnt <= 1)
+	{
+		SetGameEnd();
 		return;
 	}
 
 	//턴 바꾸기
-	if (!BLOCK_TURN_SET)
+	if (!BLOCK_TURN_SET && !SELECT_COLOR)
 	{
 		for (int i = 0; i < (TURN_JUMP ? 2 : 1);)
 		{
@@ -333,7 +367,7 @@ VOID CardGameClass::SetNextTurn(HWND hWnd)
 
 VOID CardGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 {
-	if (timer > 0 && player_turn == 0)
+	if (timer > 0 && player_turn == 0 && !SELECT_COLOR)
 	{
 
 		//무덤 클릭 시 카드 하나 뽑기
@@ -376,7 +410,12 @@ VOID CardGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 			//4. 화면 리로드
 			if (IsAllowToUse(selectCard))
 			{
-//				std::cout << "click : " << index << '\n';
+
+				//페이크 카드 지우기
+				if (FAKE_CARD != nullptr)
+				{
+					FAKE_CARD = nullptr;
+				}
 
 				//카드 지우기
 				GetNextCard()->owner = CARD_GRAVE;
@@ -405,6 +444,12 @@ VOID CardGameClass::TurnCPU(HWND hWnd)
 			select_card = cpu_cards[i];
 			if (IsAllowToUse(select_card))
 			{
+				//페이크 카드 지우기
+				if (FAKE_CARD != nullptr)
+				{
+					FAKE_CARD = nullptr;
+				}
+
 				//카드 지우기
 				GetNextCard()->owner = CARD_GRAVE;
 				select_card->owner = CARD_DECK;
@@ -421,4 +466,30 @@ VOID CardGameClass::TurnCPU(HWND hWnd)
 		GetCardFromGraves(player_turn);
 		SetNextTurn(hWnd);
 	}
+}
+
+VOID CardGameClass::SetColor(HWND hWnd, DWORD color)
+{
+	int type = -1;
+	switch (color)
+	{
+		case IDC_CARD_CLOVER:
+			type = 0;
+			break;
+		case IDC_CARD_DIAMOND:
+			type = 1;
+			break;
+		case IDC_CARD_HEART:
+			type = 2;
+			break;
+		case IDC_CARD_SPADE:
+			type = 3;
+			break;
+	}
+
+	FAKE_CARD = new Card(type, 7);
+	FAKE_CARD->owner = CARD_DECK;
+	SELECT_COLOR = FALSE;
+
+	SetNextTurn(hWnd);
 }

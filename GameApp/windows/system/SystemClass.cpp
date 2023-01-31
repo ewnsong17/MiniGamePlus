@@ -79,7 +79,15 @@ VOID SystemClass::InitializeWindows()
 	}
 }
 
-VOID SystemClass::DeleteButtons(HWND hWnd)
+VOID SystemClass::ShowButtons()
+{
+	for (auto iter = m_EditCtrl.begin(); iter != m_EditCtrl.end(); iter++)
+	{
+		ShowWindow(*iter, SW_SHOW);
+	}
+}
+
+VOID SystemClass::DeleteButtons()
 {
 	for (auto iter = m_EditCtrl.begin(); iter != m_EditCtrl.end(); iter++)
 	{
@@ -184,21 +192,20 @@ VOID SystemClass::CreateButtons(HWND hWnd)
 
 			break;
 		}
-		case CARD_GAME_END:
+		case CARD_GAME:
 		{
-			std::cout << "button create " << '\n';
 			m_EditCtrl.push_back
 			(
 				CreateWindow(
 					L"button",
 					L"다시하기",
-					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-					432,
+					WS_CHILD | BS_PUSHBUTTON,
+					362,
 					475,
 					100,
 					30,
 					hWnd,
-					(HMENU)IDC_GAME_CARD_RETRY,
+					(HMENU)IDC_GAME_CARD,
 					m_hinstance,
 					nullptr
 				)
@@ -209,13 +216,81 @@ VOID SystemClass::CreateButtons(HWND hWnd)
 				CreateWindow(
 					L"button",
 					L"그만하기",
-					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-					594,
+					WS_CHILD | BS_PUSHBUTTON,
+					524,
 					475,
 					100,
 					30,
 					hWnd,
-					(HMENU)IDC_GAME_CARD_END,
+					(HMENU)IDC_BTN_END,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_ColorCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"클로버",
+					WS_CHILD | BS_PUSHBUTTON,
+					382,
+					475,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_CARD_CLOVER,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_ColorCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"다이아몬드",
+					WS_CHILD | BS_PUSHBUTTON,
+					382,
+					515,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_CARD_DIAMOND,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_ColorCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"하트",
+					WS_CHILD | BS_PUSHBUTTON,
+					504,
+					475,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_CARD_HEART,
+					m_hinstance,
+					nullptr
+				)
+			);
+
+			m_ColorCtrl.push_back
+			(
+				CreateWindow(
+					L"button",
+					L"스페이드",
+					WS_CHILD | BS_PUSHBUTTON,
+					504,
+					515,
+					100,
+					30,
+					hWnd,
+					(HMENU)IDC_CARD_SPADE,
 					m_hinstance,
 					nullptr
 				)
@@ -330,10 +405,16 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 	}
 
 	ApplicationHandle->m_stageCnt = CARD_GAME_END;
-
-	ApplicationHandle->CreateButtons(ApplicationHandle->m_hwnd);
-
+	ApplicationHandle->ShowButtons();
 	InvalidateRect(ApplicationHandle->m_hwnd, nullptr, TRUE);
 
 	return 0;
+}
+
+VOID SystemClass::ShowColorButtons(BOOL bShow)
+{
+	for (auto iter = m_ColorCtrl.begin(); iter != m_ColorCtrl.end(); iter++)
+	{
+		ShowWindow(*iter, bShow ? SW_SHOW : SW_HIDE);
+	}
 }

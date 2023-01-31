@@ -18,8 +18,8 @@ IGame::IGame()
 		player_vector[i].player_name = player_names[i];
 	}
 
-	//항상 맨 앞에 있는 플레이어 부터 시작함.
-	player_turn = 0;
+	//먼저 시작할 사람 랜덤으로 정하기
+	player_turn = rand() % player_size;
 }
 
 VOID IGame::TurnCPU(HWND hWnd)

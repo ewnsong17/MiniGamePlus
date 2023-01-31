@@ -38,8 +38,10 @@
 constexpr int IDC_BTN_START = 1003;
 constexpr int IDC_BTN_END = 1004;
 constexpr int IDC_GAME_CARD = 1010;
-constexpr int IDC_GAME_CARD_RETRY = 1011;
-constexpr int IDC_GAME_CARD_END = 1012;
+constexpr int IDC_CARD_CLOVER = 1011;
+constexpr int IDC_CARD_DIAMOND = 1012;
+constexpr int IDC_CARD_HEART = 1013;
+constexpr int IDC_CARD_SPADE = 1014;
 constexpr int IDC_GAME_YUT = 1020;
 constexpr int IDC_GAME_OMOK = 1030;
 

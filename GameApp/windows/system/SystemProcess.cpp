@@ -36,7 +36,7 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wP
 
 VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
-	DeleteButtons(hWnd);
+	DeleteButtons();
 
 	switch (LOWORD(wParam))
 	{
@@ -51,7 +51,21 @@ VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM
 		case IDC_GAME_CARD:
 			m_stageCnt = CARD_GAME;
 			m_Game = new CardGameClass(4);
+			CreateButtons(hWnd);
 			InvalidateRect(hWnd, nullptr, TRUE);
+			break;
+		case IDC_CARD_CLOVER:
+		case IDC_CARD_DIAMOND:
+		case IDC_CARD_HEART:
+		case IDC_CARD_SPADE:
+			ShowColorButtons(FALSE);
+			if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(m_Game))
+			{
+				if (cardGame != nullptr)
+				{
+					cardGame->SetColor(hWnd, LOWORD(wParam));
+				}
+			}
 			break;
 		case IDC_GAME_YUT:
 			m_stageCnt = YUT_GAME;

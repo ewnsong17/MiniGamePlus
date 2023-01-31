@@ -16,9 +16,11 @@ public:
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 	VOID CommandHandler(HWND, UINT, WPARAM, LPARAM);
 	VOID CreateButtons(HWND hWnd);
-	VOID DeleteButtons(HWND hWnd);
+	VOID DeleteButtons();
+	VOID ShowButtons();
 
 	static DWORD WINAPI GameMainThread(LPVOID lpParam);
+	static VOID ShowColorButtons(BOOL bShow);
 
 private:
 	BOOL Frame();
@@ -41,4 +43,5 @@ private:
 };
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+static std::vector<HWND> m_ColorCtrl;
 static SystemClass* ApplicationHandle = 0;

@@ -35,8 +35,10 @@ public:
 	BOOL BLOCK_TURN_SET = FALSE;
 	BOOL TURN_REVERSE = FALSE;
 	BOOL TURN_JUMP = FALSE;
+	BOOL SELECT_COLOR = FALSE;
 	UINT ATTACK_CNT = 0;
 	UINT DEAD_LINE = 15;
+	Card* FAKE_CARD = nullptr;
 
 	CardGameClass(UINT player_size);
 
@@ -60,5 +62,7 @@ public:
 
 	VOID PlayerDead(int playerID);
 
-	virtual VOID SetGameEnd(HWND hWnd);
+	VOID SetGameEnd();
+
+	VOID SetColor(HWND hWnd, DWORD color);
 };

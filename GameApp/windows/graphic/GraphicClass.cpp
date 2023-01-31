@@ -146,7 +146,7 @@ VOID GraphicClass::OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game)
 	{
 		m_pRenderTarget->BeginDraw();
 		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-		m_pRenderTarget->Clear();
+		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
 		//배경화면 이미지 로딩
 		hr = LoadBitmapFromFile(L"image\\main_back.jpg", &bitmap);
