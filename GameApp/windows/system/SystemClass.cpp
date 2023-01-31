@@ -272,6 +272,12 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 		Sleep(1000);
 		
 		(*timer)--;
+
+		//플레이어 턴이 아닌 경우 CPU 처리
+		if (ApplicationHandle->m_Game->player_turn != 0)
+		{
+			ApplicationHandle->m_Game->TurnCPU(ApplicationHandle->m_hwnd);
+		}
 	}
 	return 0;
 }

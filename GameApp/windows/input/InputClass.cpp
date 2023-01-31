@@ -41,61 +41,12 @@ void InputClass::MouseUp(HWND hWnd, unsigned int input, unsigned int pos, IGame*
 	int xPos = LOWORD(pos);
 	int yPos = HIWORD(pos);
 
+	//원카드 처리
 	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(game))
 	{
-		if (game->player_turn == 0)
+		if (cardGame != nullptr)
 		{
-
-			//무덤 클릭 시 카드 하나 뽑기
-			if (xPos >= cardGame->grave_rect.left && xPos <= cardGame->grave_rect.right)
-			{
-				if (yPos >= cardGame->grave_rect.top && yPos <= cardGame->grave_rect.bottom)
-				{
-					cardGame->GetCardFromGraves(0);
-					cardGame->SetNextTurn(hWnd);
-					return;
-				}
-			}
-
-			std::vector<Card*> myCards = cardGame->GetPlayerCards(0);
-
-			//		std::cout << "myPos : [" << xPos << "|" << yPos << "]" << '\n';
-
-			Card* selectCard = nullptr;
-			int index = -1;
-
-			for (int i = myCards.size() - 1; i >= 0; i--)
-			{
-				if (xPos >= myCards[i]->rect.left && xPos <= myCards[i]->rect.right)
-				{
-					if (yPos >= myCards[i]->rect.top && yPos <= myCards[i]->rect.bottom)
-					{
-						selectCard = myCards[i];
-						index = i;
-						break;
-					}
-				}
-			}
-
-			if (selectCard != nullptr)
-			{
-				//카드 내기가 가능할 경우
-				//1. 카드 지우고
-				//2. 턴 바꾸고
-				//3. 타이머 다시 그리면서
-				//4. 화면 리로드
-				if (cardGame->IsAllowToUse(selectCard))
-				{
-					std::cout << "click : " << index << '\n';
-
-					//카드 지우기
-					cardGame->GetNextCard()->owner = CARD_GRAVE;
-					selectCard->owner = CARD_DECK;
-
-					//턴 변경하기
-					cardGame->SetNextTurn(hWnd);
-				}
-			}
+			cardGame->GetMouseClick(hWnd, xPos, yPos);
 		}
 	}
 }

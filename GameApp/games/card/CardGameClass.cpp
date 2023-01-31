@@ -145,7 +145,7 @@ VOID CardGameClass::GetCardFromGraves(int ownerID)
 		}
 	}
 
-	std::cout << "click grave " << card_graves.size()  << '\n';
+//	std::cout << "click grave " << card_graves.size()  << '\n';
 
 	if (card_graves.size() > 0)
 	{
@@ -153,7 +153,7 @@ VOID CardGameClass::GetCardFromGraves(int ownerID)
 
 		card_graves[0]->owner = ownerID;
 
-		std::cout << "GET : " << card_graves[0]->number << '\n';
+//		std::cout << "GET : " << card_graves[0]->number << '\n';
 	}
 }
 
@@ -162,8 +162,96 @@ VOID CardGameClass::SetNextTurn(HWND hWnd)
 	//턴 바꾸기
 	player_turn++;
 
+	if (player_turn >= player_size)
+	{
+		player_turn = 0;
+	}
+
 	//타이머 재설정
 	timer = 30;
 
 	InvalidateRect(hWnd, nullptr, TRUE);
+}
+
+VOID CardGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
+{
+	if (player_turn == 0)
+	{
+
+		//무덤 클릭 시 카드 하나 뽑기
+		if (xPos >= grave_rect.left && xPos <= grave_rect.right)
+		{
+			if (yPos >= grave_rect.top && yPos <= grave_rect.bottom)
+			{
+				GetCardFromGraves(0);
+				SetNextTurn(hWnd);
+				return;
+			}
+		}
+
+		std::vector<Card*> myCards = GetPlayerCards(0);
+
+		//		std::cout << "myPos : [" << xPos << "|" << yPos << "]" << '\n';
+
+		Card* selectCard = nullptr;
+		int index = -1;
+
+		for (int i = myCards.size() - 1; i >= 0; i--)
+		{
+			if (xPos >= myCards[i]->rect.left && xPos <= myCards[i]->rect.right)
+			{
+				if (yPos >= myCards[i]->rect.top && yPos <= myCards[i]->rect.bottom)
+				{
+					selectCard = myCards[i];
+					index = i;
+					break;
+				}
+			}
+		}
+
+		if (selectCard != nullptr)
+		{
+			//카드 내기가 가능할 경우
+			//1. 카드 지우고
+			//2. 턴 바꾸고
+			//3. 타이머 다시 그리면서
+			//4. 화면 리로드
+			if (IsAllowToUse(selectCard))
+			{
+//				std::cout << "click : " << index << '\n';
+
+				//카드 지우기
+				GetNextCard()->owner = CARD_GRAVE;
+				selectCard->owner = CARD_DECK;
+
+				//턴 변경하기
+				SetNextTurn(hWnd);
+			}
+		}
+	}
+}
+
+VOID CardGameClass::TurnCPU(HWND hWnd)
+{
+	std::vector<Card*> cpu_cards = GetPlayerCards(player_turn);
+	Card* select_card;
+	for (int i = 0; i < cpu_cards.size(); i++)
+	{
+		select_card = cpu_cards[i];
+		if (IsAllowToUse(select_card))
+		{
+			//카드 지우기
+			GetNextCard()->owner = CARD_GRAVE;
+			select_card->owner = CARD_DECK;
+
+			//턴 변경하기
+			SetNextTurn(hWnd);
+			return;
+		}
+	}
+
+	GetCardFromGraves(player_turn);
+	SetNextTurn(hWnd);
+
+	Sleep(5000);
 }

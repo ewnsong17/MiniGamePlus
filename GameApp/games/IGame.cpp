@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "IGame.h"
+#include <card/CardGameClass.h>
 
 IGame::IGame()
 {
@@ -24,4 +25,16 @@ IGame::IGame()
 VOID IGame::SetPlayerDead()
 {
 
+}
+
+VOID IGame::TurnCPU(HWND hWnd)
+{
+	//원카드 처리
+	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(this))
+	{
+		if (cardGame != nullptr)
+		{
+			cardGame->TurnCPU(hWnd);
+		}
+	}
 }

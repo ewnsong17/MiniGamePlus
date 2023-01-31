@@ -45,4 +45,8 @@ public:
 	std::wstring GetCardImage(Card* card);
 
 	BOOL IsAllowToUse(Card* card);
+
+	VOID GetMouseClick(HWND hWnd, INT xPos, INT yPos);
+
+	VOID TurnCPU(HWND hWnd);
 };
