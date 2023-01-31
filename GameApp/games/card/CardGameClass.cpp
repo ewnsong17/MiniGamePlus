@@ -277,7 +277,6 @@ VOID CardGameClass::ShowCardEffect(Card* selectCard)
 			}
 			else
 			{
-				std::cout << "CPU FAKE CARD " << '\n';
 				FAKE_CARD = new Card(rand() % 4, 7);
 			}
 			break;
