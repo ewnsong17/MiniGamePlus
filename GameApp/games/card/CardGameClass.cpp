@@ -30,6 +30,9 @@ CardGameClass::CardGameClass(UINT player_size)
 		card_list[i]->owner = (INT) (i / 7);
 	}
 
+	//카드 하나는 앞장으로 뒤집어 올려놓기
+	card_list[28]->owner = CARD_DECK;
+
 	//4. 게임 타이머 세팅
 
 	DWORD threadId = 0;
@@ -128,4 +131,39 @@ BOOL CardGameClass::IsAllowToUse(Card* card)
 		}
 	}
 	return FALSE;
+}
+
+VOID CardGameClass::GetCardFromGraves(int ownerID)
+{
+	std::vector<Card*> card_graves;
+
+	for (int i = 0; i < card_list.size(); i++)
+	{
+		if (card_list[i]->owner == CARD_GRAVE)
+		{
+			card_graves.push_back(card_list[i]);
+		}
+	}
+
+	std::cout << "click grave " << card_graves.size()  << '\n';
+
+	if (card_graves.size() > 0)
+	{
+		std::random_shuffle(card_graves.begin(), card_graves.end());
+
+		card_graves[0]->owner = ownerID;
+
+		std::cout << "GET : " << card_graves[0]->number << '\n';
+	}
+}
+
+VOID CardGameClass::SetNextTurn(HWND hWnd)
+{
+	//턴 바꾸기
+	player_turn++;
+
+	//타이머 재설정
+	timer = 30;
+
+	InvalidateRect(hWnd, nullptr, TRUE);
 }

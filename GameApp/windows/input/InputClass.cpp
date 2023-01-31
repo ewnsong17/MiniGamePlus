@@ -45,6 +45,18 @@ void InputClass::MouseUp(HWND hWnd, unsigned int input, unsigned int pos, IGame*
 	{
 		if (game->player_turn == 0)
 		{
+
+			//무덤 클릭 시 카드 하나 뽑기
+			if (xPos >= cardGame->grave_rect.left && xPos <= cardGame->grave_rect.right)
+			{
+				if (yPos >= cardGame->grave_rect.top && yPos <= cardGame->grave_rect.bottom)
+				{
+					cardGame->GetCardFromGraves(0);
+					cardGame->SetNextTurn(hWnd);
+					return;
+				}
+			}
+
 			std::vector<Card*> myCards = cardGame->GetPlayerCards(0);
 
 			//		std::cout << "myPos : [" << xPos << "|" << yPos << "]" << '\n';
@@ -80,14 +92,8 @@ void InputClass::MouseUp(HWND hWnd, unsigned int input, unsigned int pos, IGame*
 					cardGame->GetNextCard()->owner = CARD_GRAVE;
 					selectCard->owner = CARD_DECK;
 
-
-					//턴 바꾸기
-					game->player_turn++;
-
-					//타이머 재설정
-					game->timer = 30;
-
-					InvalidateRect(hWnd, nullptr, TRUE);
+					//턴 변경하기
+					cardGame->SetNextTurn(hWnd);
 				}
 			}
 		}

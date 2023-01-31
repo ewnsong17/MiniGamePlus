@@ -211,10 +211,13 @@ VOID GraphicClass::OnCardGameInit(HWND hWnd, CardGameClass* game)
 		{
 			//무덤 그려주기
 			ltSize = D2D1::Point2F(350.f, 275.f);
+			D2D1_RECT_F rect = D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + (0.66f * CARD_WIDTH), ltSize.y + (0.66f * CARD_HEIGHT));
+
+			game->grave_rect = rect;
 
 			m_pRenderTarget->DrawBitmap(
 				bitmap,
-				D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + (0.66f * CARD_WIDTH), ltSize.y + (0.66f * CARD_HEIGHT)),
+				rect,
 				1.f
 			);
 

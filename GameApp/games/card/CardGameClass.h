@@ -17,7 +17,7 @@ class Card
 public:
 	UINT color;
 	UINT number;
-	INT owner = CARD_DECK;
+	INT owner = CARD_GRAVE;
 	D2D1_RECT_F rect{};
 
 	Card(UINT _color, UINT _number) :
@@ -30,10 +30,15 @@ class CardGameClass : public IGame
 {
 public:
 	std::vector<Card*> card_list;
+	D2D1_RECT_F grave_rect{};
 
 	CardGameClass(UINT player_size);
 
 	Card* GetNextCard();
+
+	VOID GetCardFromGraves(int ownerID);
+
+	VOID SetNextTurn(HWND hWnd);
 
 	std::vector<Card*> GetPlayerCards(int index);
 
