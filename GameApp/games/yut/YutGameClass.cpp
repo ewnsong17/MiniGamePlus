@@ -14,7 +14,10 @@ YutGameClass::YutGameClass(UINT player_size)
 	//2. 윷 말 지정
 	for (int i = 0; i < player_size; i++)
 	{
-		yut_player_vec.push_back(new YutPlayer{i});
+		for (int j = 0; j < 4; j++)
+		{
+			yut_player_vec.push_back(new YutPlayer{ i , j});
+		}
 	}
 
 	//3. 시작 플레이어 재설정
@@ -36,25 +39,21 @@ VOID YutGameClass::ThrowYut(HWND hWnd)
 
 	rand_s(&rand_);
 
-	INT rand = (int) (rand_ % 78);
-
-	std::cout << "rand : " << rand << '\n';
+	INT rand = (int) (rand_ % 60);
 
 	for (auto iter = yut_info.begin(); iter != yut_info.end(); iter++)
 	{
-		rand -= iter->first;
-
-		std::cout << "rand_remain : " << rand << '\n';
+		rand -= iter->second;
 
 		if (rand <= 0)
 		{
-			yut_type = iter->second;
+			yut_type = iter->first;
 
 			//TODO:: 플레이어 말 이동
 
 			//TODO:: 윷, 모, 빽도 처리
 
-			InvalidateRect(hWnd, nullptr, TRUE);
+			SetNextTurn(hWnd);
 			break;
 		}
 	}
@@ -62,25 +61,32 @@ VOID YutGameClass::ThrowYut(HWND hWnd)
 
 VOID YutGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 {
-	D2D1_POINT_2F ltSize = D2D1::Point2F(915.f, 475.f);
-
-	float radius = 50.f;
-
-	float xVal = std::pow(static_cast<float>(xPos) - ltSize.x, 2);
-	float yVal = std::pow(static_cast<float>(yPos) - ltSize.y, 2);
-
-	if ((xVal / std::pow(radius, 2)) + (yVal / std::pow(radius, 2)) <= 1)
+	if (!player_turn)
 	{
-		ThrowYut(hWnd);
+		D2D1_POINT_2F ltSize = D2D1::Point2F(902.5f, 475.f);
+
+		float radius = 50.f;
+
+		float xVal = std::pow(static_cast<float>(xPos) - ltSize.x, 2);
+		float yVal = std::pow(static_cast<float>(yPos) - ltSize.y, 2);
+
+		if ((xVal / std::pow(radius, 2)) + (yVal / std::pow(radius, 2)) <= 1)
+		{
+			ThrowYut(hWnd);
+		}
 	}
 }
 
 VOID YutGameClass::TurnCPU(HWND hWnd)
 {
-
+	ThrowYut(hWnd);
 }
 
 VOID YutGameClass::SetNextTurn(HWND hWnd)
 {
+	player_turn = !player_turn;
 
+	timer = 30;
+
+	InvalidateRect(hWnd, nullptr, TRUE);
 }

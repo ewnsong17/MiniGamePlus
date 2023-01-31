@@ -5,6 +5,7 @@ class YutPlayer
 {
 public:
 	INT owner;
+	INT index;
 	INT pos = -1;
 	BOOL bEnter = FALSE;
 	BOOL bClear = FALSE;
@@ -15,14 +16,14 @@ class YutGameClass : public IGame
 public:
 	std::vector<YutPlayer*> yut_player_vec;
 
-	std::map<INT, std::wstring> yut_info
+	std::map<std::wstring, INT> yut_info
 	{
-		{2, L"»ªµµ"},
-		{15, L"µµ"},
-		{25, L"°³"},
-		{25, L"°É"},
-		{7, L"À·"},
-		{4, L"¸ð"},
+		{L"»ªµµ", 2},
+		{L"µµ", 12},
+		{L"°³", 18},
+		{L"°É", 18},
+		{L"À·", 7},
+		{L"¸ð", 3},
 	};
 
 	std::wstring yut_type = L"";

@@ -179,27 +179,60 @@ VOID GraphicClass::OnYutGameInit(HWND hWnd, BOOL bGameEnd, YutGameClass* game)
 			//배경화면 그리기
 			m_pRenderTarget->DrawBitmap(
 				bitmap,
-				D2D1::RectF(-25.f, -40.f, SCREEN_WIDTH, SCREEN_HEIGHT),
+				D2D1::RectF(-195.f, -40.f, SCREEN_WIDTH, SCREEN_HEIGHT),
 				1.f
 			);
 		}
 
 		//원 그리기
-		ltSize = D2D1::Point2F(915.f, 475.f);
+		ltSize = D2D1::Point2F(902.5f, 475.f);
 		D2D1_ELLIPSE ellipse = D2D1::Ellipse(ltSize, 75.f, 75.f);
 		m_pRenderTarget->DrawEllipse(ellipse, m_pBlackBrush, 3.5f);
 
 		//글씨 그리기
-		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 213.5f, 650.f);
+		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 241.5f, 200.f);
+		text = std::to_wstring(game->timer);
+
+		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat_2, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
+		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 241.5f, 400.f);
+		if (game->player_turn)
+		{
+			text = L"적의 차례입니다.";
+			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+		}
+		else
+		{
+			text = L"나의 차례입니다.";
+			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+		}
+
+		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 241.5f, 650.f);
 
 		text = game->yut_type;
 		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
 
 
-		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 213.5f, 950.f);
+		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 241.5f, 950.f);
 
 		text = L"윷 던지기";
 		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
+		for (auto iter = game->yut_player_vec.begin(); iter != game->yut_player_vec.end(); iter++)
+		{
+			rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 326.5f + (50.f * (*iter)->index), (50 * (*iter)->owner) + 1150.f);
+
+			if ((*iter)->bClear)
+			{
+				text = (*iter)->owner ? L"◆" : L"★";
+			}
+			else if (!(*iter)->bEnter)
+			{
+				text = (*iter)->owner ? L"◇" : L"☆";
+			}
+
+			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+		}
 
 		hr = m_pRenderTarget->EndDraw();
 	}
