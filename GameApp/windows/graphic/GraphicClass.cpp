@@ -172,27 +172,34 @@ VOID GraphicClass::OnYutGameInit(HWND hWnd, BOOL bGameEnd, YutGameClass* game)
 		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
 
 		//배경화면 이미지 로딩
-		hr = LoadBitmapFromFile(L"image\\game_yut_back.png", &bitmap);
+		hr = LoadBitmapFromFile(L"image\\game_yut_back.jpg", &bitmap);
 
 		if (SUCCEEDED(hr))
 		{
 			//배경화면 그리기
-			ltSize = D2D1::Point2F(581.f, 579.f);
-
 			m_pRenderTarget->DrawBitmap(
 				bitmap,
-				D2D1::RectF(-30.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT),
+				D2D1::RectF(-25.f, -40.f, SCREEN_WIDTH, SCREEN_HEIGHT),
 				1.f
 			);
 		}
 
-		//float marginX = 175.f;
-		//float marginY = 60.f;
-		//float length = 600.f;
+		//원 그리기
+		ltSize = D2D1::Point2F(915.f, 475.f);
+		D2D1_ELLIPSE ellipse = D2D1::Ellipse(ltSize, 75.f, 75.f);
+		m_pRenderTarget->DrawEllipse(ellipse, m_pBlackBrush, 3.5f);
 
-		//D2D1_RECT_F rect = D2D1::RectF(150.f, 60.f, 150.f + 600.f, 60.f + 600.f);
+		//글씨 그리기
+		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 213.5f, 650.f);
 
-		//m_pRenderTarget->DrawRectangle(rect, m_pBlackBrush, 1.5f);
+		text = game->yut_type;
+		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
+
+		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 213.5f, 950.f);
+
+		text = L"윷 던지기";
+		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
 
 		hr = m_pRenderTarget->EndDraw();
 	}

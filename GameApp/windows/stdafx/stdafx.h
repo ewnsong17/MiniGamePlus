@@ -23,6 +23,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <map>
 #include <algorithm>
 
 // C 런타임 헤더 파일입니다.

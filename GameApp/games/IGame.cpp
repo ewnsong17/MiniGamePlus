@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "IGame.h"
 #include <card/CardGameClass.h>
+#include <yut/YutGameClass.h>
 #include <omok/OmokGameClass.h>
 
 IGame::IGame()
@@ -99,6 +100,15 @@ VOID IGame::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 		if (cardGame != nullptr)
 		{
 			cardGame->GetMouseClick(hWnd, xPos, yPos);
+		}
+	}
+
+	//¿∑≥Ó¿Ã √≥∏Æ
+	if (YutGameClass* yutGame = dynamic_cast<YutGameClass*>(this))
+	{
+		if (yutGame != nullptr)
+		{
+			yutGame->GetMouseClick(hWnd, xPos, yPos);
 		}
 	}
 

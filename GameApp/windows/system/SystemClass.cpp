@@ -426,6 +426,7 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 		//2중 조건문 참조
 		if ((*timer) > 0
 			&& ApplicationHandle->m_stageCnt != CARD_GAME_END
+			&& ApplicationHandle->m_stageCnt != YUT_GAME_END
 			&& ApplicationHandle->m_stageCnt != OMOK_GAME_END)
 		{
 			(*timer)--;
@@ -463,6 +464,12 @@ VOID SystemClass::EndGame()
 	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(m_Game))
 	{
 		ApplicationHandle->m_stageCnt = CARD_GAME_END;
+	}
+
+	//윷놀이 처리
+	if (CardGameClass* cardGame = dynamic_cast<CardGameClass*>(m_Game))
+	{
+		ApplicationHandle->m_stageCnt = YUT_GAME_END;
 	}
 
 	//오목 처리
