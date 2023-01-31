@@ -16,7 +16,7 @@ public:
 
 	IGame();
 
-	UINT timer = 30;
+	INT timer = 30;
 
 	virtual VOID TurnCPU(HWND hWnd);
 

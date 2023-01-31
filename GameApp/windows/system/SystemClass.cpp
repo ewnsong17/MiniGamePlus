@@ -416,7 +416,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 
 DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 {
-	UINT* timer = &(ApplicationHandle->m_Game->timer);
+	INT* timer = &(ApplicationHandle->m_Game->timer);
 
 	while (*timer > 0)
 	{
@@ -424,7 +424,9 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 		Sleep(1000);
 		
 		//2중 조건문 참조
-		if (*timer > 0)
+		if ((*timer) > 0
+			&& ApplicationHandle->m_stageCnt != CARD_GAME_END
+			&& ApplicationHandle->m_stageCnt != OMOK_GAME_END)
 		{
 			(*timer)--;
 
@@ -434,7 +436,7 @@ DWORD WINAPI SystemClass::GameMainThread(LPVOID lpParam)
 				ApplicationHandle->m_Game->TurnCPU(ApplicationHandle->m_hwnd);
 			}
 
-			if (*timer <= 0)
+			if (*timer > -10000 && *timer <= 0)
 			{
 				*timer = 3000;
 				ApplicationHandle->m_Game->ForceSetNextTurn(ApplicationHandle->m_hwnd);

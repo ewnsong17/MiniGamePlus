@@ -218,15 +218,10 @@ VOID GraphicClass::OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game)
 					(*iter)->bClick == CLICK_WHITE ? m_pCornSlikBrush : m_pBlackBrush);
 			}
 		}
-		
-		//텍스트 그리기
+
 		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 300.f, 130.f);
-		text = std::to_wstring(game->timer);
 
-		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat_2, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
-
-		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 285.f, 250.f);
-
+		//텍스트 그리기
 		if (bGameEnd)
 		{
 			text = std::wstring(game->player_vector[game->player_turn].player_name) + L"의 승리입니다!";
@@ -234,6 +229,13 @@ VOID GraphicClass::OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game)
 		}
 		else
 		{
+
+			text = std::to_wstring(game->timer);
+
+			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat_2, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
+			rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 285.f, 250.f);
+
 			if (game->player_turn)
 			{
 				text = L"적의 차례입니다.";

@@ -247,7 +247,7 @@ VOID CardGameClass::GetCardFromGraves(int ownerID)
 
 VOID CardGameClass::SetGameEnd()
 {
-	timer = 0;
+	timer = -10000;
 }
 
 VOID CardGameClass::ShowCardEffect(Card* selectCard)
