@@ -87,7 +87,7 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 	//우선순위
 
 	int index = -1;
-	int priority = 7;
+	int priority = 9;
 	std::set<int> index_list;
 
 	for (int i = 0; i < pos_list.size(); i++)
@@ -111,15 +111,15 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 							//4번째 위치도 안막혔는지 체크
 							if (pos_list[(long long)i + 63]->bClick == turn)
 							{
-								//1. 4개에서 5개가 가능하면 제일 먼저 한다.
-								//2. 상대의 4개를 무조건 막는다.
+								//1. 상대의 4개를 무조건 막는다.
+								//2. 내 4개를 무조건 잇는다.
 								if (i - 21 >= 0)
 								{
 									if (pos_list[(long long)i - 21]->bClick == CLICK_NONE)
 									{
-										if (priority > (turn == player_turn ? 1 : 2))
+										if (priority > (turn == player_turn ? 2 : 1))
 										{
-											priority = (turn == player_turn ? 1 : 2);
+											priority = (turn == player_turn ? 2 : 1);
 											index = i - 21;
 											break;
 										}
@@ -128,9 +128,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 
 								if (pos_list[(long long)i + 84]->bClick == CLICK_NONE)
 								{
-									if (priority > (turn == player_turn ? 1 : 2))
+									if (priority > (turn == player_turn ? 2 : 1))
 									{
-										priority = (turn == player_turn ? 1 : 2);
+										priority = (turn == player_turn ? 2 : 1);
 										index = i + 84;
 										break;
 									}
@@ -145,76 +145,49 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 									INT left_turn = pos_list[(long long)i - 21]->bClick;
 									INT right_turn = pos_list[(long long)i + 63]->bClick;
 
-									if (turn != player_turn)
+									if (left_turn == CLICK_NONE && right_turn == CLICK_NONE)
 									{
-										if (left_turn == CLICK_NONE && right_turn == CLICK_NONE)
+										//3. 상대 양쪽 안막힌 3개를 막는다.
+										// ㅁ -> xㅁㅁㅁx
+
+										//5. 내 양쪽 안막힌 3개를 잇는다.
+										// ■ -> x■■■x
+
+										if (priority > (turn != player_turn) ? 3 : 5)
 										{
-											//3. 상대 양쪽 안막힌 3개를 막는다.
-											// ㅁ -> xㅁㅁㅁx
-											if (priority > 3)
-											{
-												priority = 3;
-												index = i + 63;
-												break;
-											}
-										}
-										else if (left_turn == CLICK_NONE && right_turn != CLICK_NONE)
-										{
-											//4. 상대 한쪽 안막힌 3개를 막는다.
-											// ㅁ -> xㅁㅁㅁ■
-											if (priority > 4)
-											{
-												priority = 4;
-												index = i - 21;
-												break;
-											}
-										}
-										else if (left_turn == player_turn && right_turn == CLICK_NONE)
-										{
-											//4. 상대 한쪽 안막힌 3개를 막는다.
-											// ㅁ -> ■ㅁㅁㅁx
-											if (priority > 4)
-											{
-												priority = 4;
-												index = i + 63;
-												break;
-											}
+											priority = (turn != player_turn) ? 3 : 5;
+											index = (turn != player_turn) ? (i - 21) : (i + 63);
+											break;
 										}
 									}
-									else
+									else if (left_turn == CLICK_NONE && right_turn != CLICK_NONE)
 									{
-										if (left_turn == CLICK_NONE && right_turn == CLICK_NONE)
+										//4. 상대 한쪽 안막힌 3개를 막는다.
+										// ㅁ -> xㅁㅁㅁ■
+
+										//6. 내 한쪽 안막힌 3개를 잇는다.
+										// ■ -> x■■■ㅁ
+
+										if (priority > (turn != player_turn) ? 4 : 6)
 										{
-											//5. 내 양쪽 안막힌 3개를 잇는다.
-											// ■ -> x■■■x
-											if (priority > 5)
-											{
-												priority = 5;
-												index = i - 21;
-												break;
-											}
+											priority = (turn != player_turn) ? 4 : 6;
+											index = i - 21;
+											break;
 										}
-										else if (left_turn == CLICK_NONE && right_turn != CLICK_NONE)
+									}
+									else if (left_turn == player_turn && right_turn == CLICK_NONE)
+									{
+										//4. 상대 한쪽 안막힌 3개를 막는다.
+										// ㅁ -> ■ㅁㅁㅁx
+
+										//6. 내 한쪽 안막힌 3개를 잇는다.
+										// ■ -> ㅁ■■■x
+
+										if (priority > (turn != player_turn) ? 4 : 6)
 										{
-											//6. 내 한쪽 안막힌 3개를 잇는다.
-											// ■ -> x■■■ㅁ
-											if (priority > 6)
-											{
-												priority = 6;
-												index = i - 21;
-												break;
-											}
-										}
-										else if (left_turn == player_turn && right_turn == CLICK_NONE)
-										{
-											//6. 내 한쪽 안막힌 3개를 잇는다.
-											// ■ -> ㅁ■■■x
-											if (priority > 6)
-											{
-												priority = 6;
-												index = i + 63;
-												break;
-											}
+											priority = (turn != player_turn) ? 4 : 6;
+											index = i + 63;
+											break;
 										}
 									}
 								}
@@ -222,10 +195,10 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 						}
 						else if (turn == player_turn && pos_list[(long long)i + 42]->bClick == CLICK_NONE)
 						{
-							//5. 내 양쪽 안막힌 2개를 잇는다.
-							if (priority > 5)
+							//7. 내 양쪽 안막힌 2개를 잇는다.
+							if (priority > 7)
 							{
-								priority = 5;
+								priority = 7;
 								index = i + 42;
 								break;
 							}
@@ -233,10 +206,10 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 					}
 					else if (turn == player_turn && pos_list[(long long)i + 21]->bClick == CLICK_NONE)
 					{
-						//6. 내 돌 옆에 잇는다.
-						if (priority >= 6)
+						//8. 내 돌 옆에 잇는다.
+						if (priority >= 8)
 						{
-							priority = 6;
+							priority = 8;
 							index_list.insert(i + 21);
 							break;
 						}
@@ -264,9 +237,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 								{
 									if (pos_list[(long long)i - 1]->bClick == CLICK_NONE)
 									{
-										if (priority > (turn == player_turn ? 1 : 2))
+										if (priority > (turn == player_turn ? 2 : 1))
 										{
-											priority = (turn == player_turn ? 1 : 2);
+											priority = (turn == player_turn ? 2 : 1);
 											index = i - 1;
 											break;
 										}
@@ -275,9 +248,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 
 								if (pos_list[(long long)i + 4]->bClick == CLICK_NONE)
 								{
-									if (priority > (turn == player_turn ? 1 : 2))
+									if (priority > (turn == player_turn ? 2 : 1))
 									{
-										priority = (turn == player_turn ? 1 : 2);
+										priority = (turn == player_turn ? 2 : 1);
 										index = i + 4;
 										break;
 									}
@@ -287,43 +260,62 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 							{
 								if (i - 1 >= 0)
 								{
-									if (pos_list[(long long)i - 1]->bClick == CLICK_NONE)
+									INT left_turn = pos_list[(long long)i - 1]->bClick;
+									INT right_turn = pos_list[(long long)i + 3]->bClick;
+
+									if (left_turn == CLICK_NONE && right_turn == CLICK_NONE)
 									{
-										if (priority > (turn == player_turn ? 4 : 3))
+										//3. 상대 양쪽 안막힌 3개를 막는다.
+										// ㅁ -> xㅁㅁㅁx
+
+										//5. 내 양쪽 안막힌 3개를 잇는다.
+										// ■ -> x■■■x
+
+										if (priority > (turn != player_turn) ? 3 : 5)
 										{
-											priority = (turn == player_turn ? 4 : 3);
+											priority = (turn != player_turn) ? 3 : 5;
+											index = (turn != player_turn) ? (i - 1) : (i + 3);
+											break;
+										}
+									}
+									else if (left_turn == CLICK_NONE && right_turn != CLICK_NONE)
+									{
+										//4. 상대 한쪽 안막힌 3개를 막는다.
+										// ㅁ -> xㅁㅁㅁ■
+
+										//6. 내 한쪽 안막힌 3개를 잇는다.
+										// ■ -> x■■■ㅁ
+
+										if (priority > (turn != player_turn) ? 4 : 6)
+										{
+											priority = (turn != player_turn) ? 4 : 6;
 											index = i - 1;
 											break;
 										}
 									}
-								}
-
-								if (turn != player_turn && pos_list[(long long)i + 3]->bClick == CLICK_NONE)
-								{
-									if (priority > 3)
+									else if (left_turn == player_turn && right_turn == CLICK_NONE)
 									{
-										priority = 3;
-										index = i + 3;
-										break;
-									}
-								}
-								else if (turn == player_turn && pos_list[(long long)i + 3]->bClick == CLICK_NONE)
-								{
+										//4. 상대 한쪽 안막힌 3개를 막는다.
+										// ㅁ -> ■ㅁㅁㅁx
 
-									if (priority > 4)
-									{
-										priority = 4;
-										index = i + 3;
-										break;
+										//6. 내 한쪽 안막힌 3개를 잇는다.
+										// ■ -> ㅁ■■■x
+
+										if (priority > (turn != player_turn) ? 4 : 6)
+										{
+											priority = (turn != player_turn) ? 4 : 6;
+											index = i + 6;
+											break;
+										}
 									}
 								}
 							}
 						}
 						else if (turn == player_turn && pos_list[(long long)i + 2]->bClick == CLICK_NONE)
 						{
-							if (priority > 5)
+							if (priority > 7)
 							{
-								priority = 5;
+								priority = 7;
 								index = i + 2;
 								break;
 							}
@@ -331,9 +323,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 					}
 					else if (pos_list[(long long)i + 1]->bClick == CLICK_NONE)
 					{
-						if (priority >= 6)
+						if (priority >= 8)
 						{
-							priority = 6;
+							priority = 8;
 							index_list.insert(i + 1);
 							break;
 						}
@@ -360,9 +352,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 								{
 									if (pos_list[(long long)i - 22]->bClick == CLICK_NONE)
 									{
-										if (priority > (turn == player_turn ? 1 : 2))
+										if (priority > (turn == player_turn ? 2 : 1))
 										{
-											priority = (turn == player_turn ? 1 : 2);
+											priority = (turn == player_turn ? 2 : 1);
 											index = i - 22;
 											break;
 										}
@@ -371,9 +363,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 
 								if (pos_list[(long long)i + 88]->bClick == CLICK_NONE)
 								{
-									if (priority > (turn == player_turn ? 1 : 2))
+									if (priority > (turn == player_turn ? 2 : 1))
 									{
-										priority = (turn == player_turn ? 1 : 2);
+										priority = (turn == player_turn ? 2 : 1);
 										index = i + 88;
 										break;
 									}
@@ -383,43 +375,62 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 							{
 								if (i - 22 >= 0)
 								{
-									if (pos_list[(long long)i - 22]->bClick == CLICK_NONE)
+									INT left_turn = pos_list[(long long)i - 22]->bClick;
+									INT right_turn = pos_list[(long long)i + 66]->bClick;
+
+									if (left_turn == CLICK_NONE && right_turn == CLICK_NONE)
 									{
-										if (priority > (turn == player_turn ? 4 : 3))
+										//3. 상대 양쪽 안막힌 3개를 막는다.
+										// ㅁ -> xㅁㅁㅁx
+
+										//5. 내 양쪽 안막힌 3개를 잇는다.
+										// ■ -> x■■■x
+
+										if (priority > (turn != player_turn) ? 3 : 5)
 										{
-											priority = (turn == player_turn ? 4 : 3);
+											priority = (turn != player_turn) ? 3 : 5;
+											index = (turn != player_turn) ? (i - 22) : (i + 66);
+											break;
+										}
+									}
+									else if (left_turn == CLICK_NONE && right_turn != CLICK_NONE)
+									{
+										//4. 상대 한쪽 안막힌 3개를 막는다.
+										// ㅁ -> xㅁㅁㅁ■
+
+										//6. 내 한쪽 안막힌 3개를 잇는다.
+										// ■ -> x■■■ㅁ
+
+										if (priority > (turn != player_turn) ? 4 : 6)
+										{
+											priority = (turn != player_turn) ? 4 : 6;
 											index = i - 22;
 											break;
 										}
 									}
-								}
-
-								if (turn != player_turn && pos_list[(long long)i + 66]->bClick == CLICK_NONE)
-								{
-									if (priority > 3)
+									else if (left_turn == player_turn && right_turn == CLICK_NONE)
 									{
-										priority = 3;
-										index = i + 66;
-										break;
-									}
-								}
-								else if (turn == player_turn && pos_list[(long long)i + 66]->bClick == CLICK_NONE)
-								{
+										//4. 상대 한쪽 안막힌 3개를 막는다.
+										// ㅁ -> ■ㅁㅁㅁx
 
-									if (priority > 4)
-									{
-										priority = 4;
-										index = i + 66;
-										break;
+										//6. 내 한쪽 안막힌 3개를 잇는다.
+										// ■ -> ㅁ■■■x
+
+										if (priority > (turn != player_turn) ? 4 : 6)
+										{
+											priority = (turn != player_turn) ? 4 : 6;
+											index = i + 66;
+											break;
+										}
 									}
 								}
 							}
 						}
 						else if (turn == player_turn && pos_list[(long long)i + 44]->bClick == CLICK_NONE)
 						{
-							if (priority > 5)
+							if (priority > 7)
 							{
-								priority = 5;
+								priority = 7;
 								index = i + 44;
 								break;
 							}
@@ -427,9 +438,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 					}
 					else if (pos_list[(long long)i + 22]->bClick == CLICK_NONE)
 					{
-						if (priority >= 6)
+						if (priority >= 8)
 						{
-							priority = 6;
+							priority = 8;
 							index_list.insert(i + 22);
 							break;
 						}
@@ -455,9 +466,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 							{
 								if (pos_list[(long long)i + 20]->bClick == CLICK_NONE)
 								{
-									if (priority > (turn == player_turn ? 1 : 2))
+									if (priority > (turn == player_turn ? 2 : 1))
 									{
-										priority = (turn == player_turn ? 1 : 2);
+										priority = (turn == player_turn ? 2 : 1);
 										index = i + 20;
 										break;
 									}
@@ -465,9 +476,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 
 								if (pos_list[(long long)i - 80]->bClick == CLICK_NONE)
 								{
-									if (priority > (turn == player_turn ? 1 : 2))
+									if (priority > (turn == player_turn ? 2 : 1))
 									{
-										priority = (turn == player_turn ? 1 : 2);
+										priority = (turn == player_turn ? 2 : 1);
 										index = i - 80;
 										break;
 									}
@@ -475,31 +486,50 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 							}
 							else
 							{
-								if (pos_list[(long long)i + 20]->bClick == CLICK_NONE)
+								INT left_turn = pos_list[(long long)i + 20]->bClick;
+								INT right_turn = pos_list[(long long)i - 60]->bClick;
+
+								if (left_turn == CLICK_NONE && right_turn == CLICK_NONE)
 								{
-									if (priority > (turn == player_turn ? 4 : 3))
+									//3. 상대 양쪽 안막힌 3개를 막는다.
+									// ㅁ -> xㅁㅁㅁx
+
+									//5. 내 양쪽 안막힌 3개를 잇는다.
+									// ■ -> x■■■x
+
+									if (priority > (turn != player_turn) ? 3 : 5)
 									{
-										priority = (turn == player_turn ? 4 : 3);
+										priority = (turn != player_turn) ? 3 : 5;
+										index = (turn != player_turn) ? (i + 20) : (i - 60);
+										break;
+									}
+								}
+								else if (left_turn == CLICK_NONE && right_turn != CLICK_NONE)
+								{
+									//4. 상대 한쪽 안막힌 3개를 막는다.
+									// ㅁ -> xㅁㅁㅁ■
+
+									//6. 내 한쪽 안막힌 3개를 잇는다.
+									// ■ -> x■■■ㅁ
+
+									if (priority > (turn != player_turn) ? 4 : 6)
+									{
+										priority = (turn != player_turn) ? 4 : 6;
 										index = i + 20;
 										break;
 									}
 								}
-
-								if (turn != player_turn && pos_list[(long long)i - 60]->bClick == CLICK_NONE)
+								else if (left_turn == player_turn && right_turn == CLICK_NONE)
 								{
-									if (priority > 3)
-									{
-										priority = 3;
-										index = i - 60;
-										break;
-									}
-								}
-								else if (turn == player_turn && pos_list[(long long)i - 60]->bClick == CLICK_NONE)
-								{
+									//4. 상대 한쪽 안막힌 3개를 막는다.
+									// ㅁ -> ■ㅁㅁㅁx
 
-									if (priority > 4)
+									//6. 내 한쪽 안막힌 3개를 잇는다.
+									// ■ -> ㅁ■■■x
+
+									if (priority > (turn != player_turn) ? 4 : 6)
 									{
-										priority = 4;
+										priority = (turn != player_turn) ? 4 : 6;
 										index = i - 60;
 										break;
 									}
@@ -508,9 +538,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 						}
 						else if (turn == player_turn && pos_list[(long long)i - 40]->bClick == CLICK_NONE)
 						{
-							if (priority > 5)
+							if (priority > 7)
 							{
-								priority = 5;
+								priority = 7;
 								index = i - 40;
 								break;
 							}
@@ -518,9 +548,9 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 					}
 					else if (pos_list[(long long)i - 20]->bClick == CLICK_NONE)
 					{
-						if (priority >= 6)
+						if (priority >= 8)
 						{
-							priority = 6;
+							priority = 8;
 							index_list.insert(i - 20);
 							break;
 						}
