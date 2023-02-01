@@ -11,11 +11,6 @@
 *.userprefs
 
 # Build results
-GameApp/x64/[Dd]ebug/
-GameApp/x64/[Dd]ebugPublic/
-GameApp/x64/[Rr]elease/
-GameApp/x64/[Rr]eleases/
-GameApp/x64/
 GameApp/x86/
 GameApp/bld/
 GameApp/[Bb]in/
