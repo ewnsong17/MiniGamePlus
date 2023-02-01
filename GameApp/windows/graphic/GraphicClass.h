@@ -3,6 +3,7 @@
 #include <card/CardGameClass.h>
 #include <yut/YutGameClass.h>
 #include <omok/OmokGameClass.h>
+#include <spider/SpiderGameClass.h>
 
 class GraphicClass
 {
@@ -22,6 +23,7 @@ public:
 	VOID OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game);
 	VOID OnYutGameInit(HWND hWnd, BOOL bGameEnd, YutGameClass* game);
 	VOID OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game);
+	VOID OnSpiderGameInit(HWND hWnd, BOOL bGameEnd, SpiderGameClass* game);
 
 	template <typename T>
 	inline VOID SafeRelease(T*& p)
@@ -38,6 +40,7 @@ public:
 		SafeRelease(m_pRenderTarget);
 		SafeRelease(m_pCornSlikBrush);
 		SafeRelease(m_pBlackBrush);
+		SafeRelease(m_pYellowBrush);
 		SafeRelease(m_pCornflowerBlueBrush);
 	}
 
@@ -46,6 +49,7 @@ private:
 	ID2D1HwndRenderTarget* m_pRenderTarget;
 	ID2D1SolidColorBrush* m_pCornSlikBrush;
 	ID2D1SolidColorBrush* m_pBlackBrush;
+	ID2D1SolidColorBrush* m_pYellowBrush;
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
 
 	IWICImagingFactory* m_pIWICFactory;

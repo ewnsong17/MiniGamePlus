@@ -1,4 +1,8 @@
 #pragma once
+
+constexpr UINT CARD_WIDTH = 110;
+constexpr UINT CARD_HEIGHT = 154;
+
 class IGamePlayer
 {
 public:

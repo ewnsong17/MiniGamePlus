@@ -24,7 +24,8 @@ YutGameClass::YutGameClass(UINT player_size)
 	unsigned int rand;
 	rand_s(&rand);
 
-	player_turn = rand % player_size;
+	player_turn = 0;// rand% player_size;
+	system_message = L"나의 차례입니다.";
 
 	//4. 게임 타이머 세팅
 
@@ -50,13 +51,18 @@ VOID YutGameClass::ThrowYut(HWND hWnd)
 			yut_type = iter->first;
 
 			//TODO:: 플레이어 말 이동
+			SetPlayerYutMoveList(hWnd);
 
 			//TODO:: 윷, 모, 빽도 처리
-
-			SetNextTurn(hWnd);
 			break;
 		}
 	}
+}
+
+VOID YutGameClass::SetPlayerYutMoveList(HWND hWnd)
+{
+	system_message = L"말을 선택하세요.";
+	InvalidateRect(hWnd, nullptr, TRUE);
 }
 
 VOID YutGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)

@@ -50,6 +50,7 @@ constexpr int IDC_CARD_HEART = 1013;
 constexpr int IDC_CARD_SPADE = 1014;
 constexpr int IDC_GAME_YUT = 1020;
 constexpr int IDC_GAME_OMOK = 1030;
+constexpr int IDC_GAME_SPIDER = 1040;
 
 //해상도 사이즈 입니다.
 constexpr int SCREEN_WIDTH = 1024;
@@ -64,5 +65,7 @@ constexpr unsigned int YUT_GAME = 200;
 constexpr unsigned int YUT_GAME_END = 201;
 constexpr unsigned int OMOK_GAME = 300;
 constexpr unsigned int OMOK_GAME_END = 301;
+constexpr unsigned int SPIDER_GAME = 400;
+constexpr unsigned int SPIDER_GAME_END = 401;
 
 // TODO: 프로그램에 필요한 추가 헤더는 여기에서 참조합니다.

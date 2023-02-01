@@ -160,14 +160,14 @@ VOID SystemClass::CreateButtons(HWND hWnd)
 			(
 				CreateWindow(
 					L"button",
-					L"¿∑≥Ó¿Ã",
+					L"Ω∫∆ƒ¿Ã¥ı",
 					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 					432,
 					675,
 					100,
 					30,
 					hWnd,
-					(HMENU)IDC_GAME_YUT,
+					(HMENU)IDC_GAME_SPIDER,
 					m_hinstance,
 					nullptr
 				)

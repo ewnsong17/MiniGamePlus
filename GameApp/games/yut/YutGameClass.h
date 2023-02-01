@@ -26,11 +26,15 @@ public:
 		{L"¸ð", 3},
 	};
 
+	std::wstring system_message = L"";
+
 	std::wstring yut_type = L"";
 
 	YutGameClass(UINT player_size);
 
 	VOID ThrowYut(HWND hWnd);
+
+	VOID SetPlayerYutMoveList(HWND hWnd);
 
 	virtual VOID GetMouseClick(HWND hWnd, INT xPos, INT yPos);
 

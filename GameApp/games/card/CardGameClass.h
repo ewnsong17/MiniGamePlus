@@ -9,9 +9,6 @@ constexpr UINT DIAMOND = 1;
 constexpr UINT HEART = 2;
 constexpr UINT SPADE = 3;
 
-constexpr UINT CARD_WIDTH = 110;
-constexpr UINT CARD_HEIGHT = 154;
-
 class Card
 {
 public:

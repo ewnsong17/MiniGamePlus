@@ -42,6 +42,9 @@
     <ClInclude Include="games\yut\YutGameClass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="games\spider\SpiderGameClass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="windows\stdafx\stdafx.cpp">
@@ -72,6 +75,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="games\yut\YutGameClass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="games\spider\SpiderGameClass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

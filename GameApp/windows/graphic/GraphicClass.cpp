@@ -7,6 +7,7 @@ GraphicClass::GraphicClass() :
 	m_pRenderTarget(nullptr),
 	m_pCornSlikBrush(nullptr),
 	m_pBlackBrush(nullptr),
+	m_pYellowBrush(nullptr),
 	m_pCornflowerBlueBrush(nullptr),
 	m_pIWICFactory(nullptr),
 	m_pDWriteFactory(nullptr),
@@ -20,6 +21,7 @@ GraphicClass::~GraphicClass()
 	SafeRelease(m_pRenderTarget);
 	SafeRelease(m_pCornSlikBrush);
 	SafeRelease(m_pBlackBrush);
+	SafeRelease(m_pYellowBrush);
 	SafeRelease(m_pCornflowerBlueBrush);
 	SafeRelease(m_pIWICFactory);
 	SafeRelease(m_pDWriteFactory);
@@ -107,6 +109,11 @@ HRESULT GraphicClass::CreateDeviceResources(HWND hWnd)
 
 		if (SUCCEEDED(hr))
 		{
+			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::GreenYellow), &m_pYellowBrush);
+		}
+
+		if (SUCCEEDED(hr))
+		{
 			hr = m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::CornflowerBlue), &m_pCornflowerBlueBrush);
 		}
 	}
@@ -142,16 +149,123 @@ VOID GraphicClass::OnRender(HWND hWnd, UINT& m_stageCnt, IGame* game)
 				OnCardGameInit(hWnd, m_stageCnt == CARD_GAME_END, (CardGameClass*) game);
 				break;
 			case YUT_GAME:
-				OnYutGameInit(hWnd, m_stageCnt == YUT_GAME_END, (YutGameClass*) game);
+			case YUT_GAME_END:
+//				OnYutGameInit(hWnd, m_stageCnt == YUT_GAME_END, (YutGameClass*) game);
 				break;
 			case OMOK_GAME:
 			case OMOK_GAME_END:
 				OnOmokGameInit(hWnd, m_stageCnt == OMOK_GAME_END, (OmokGameClass*) game);
 				break;
+			case SPIDER_GAME:
+			case SPIDER_GAME_END:
+				OnSpiderGameInit(hWnd, m_stageCnt == SPIDER_GAME_END, (SpiderGameClass*) game);
+				break;
 		}
 	}
 
 	EndPaint(hWnd, &ps);
+}
+
+VOID GraphicClass::OnSpiderGameInit(HWND hWnd, BOOL bGameEnd, SpiderGameClass* game)
+{
+	ID2D1Bitmap* bitmap;
+	D2D1_POINT_2F ltSize;
+
+	D2D1_RECT_F rect;
+
+	HRESULT hr = CreateDeviceResources(hWnd);
+
+	//그리기 모드 시작
+	if (SUCCEEDED(hr))
+	{
+		m_pRenderTarget->BeginDraw();
+		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+
+		//배경화면 이미지 로딩
+		hr = LoadBitmapFromFile(L"image\\game_card_back.jpg", &bitmap);
+
+		if (SUCCEEDED(hr))
+		{
+			//배경화면 그리기
+			m_pRenderTarget->DrawBitmap(
+				bitmap,
+				D2D1::RectF(-195.f, -40.f, SCREEN_WIDTH, SCREEN_HEIGHT),
+				1.f
+			);
+		}
+
+		//위쪽 카드 리스트 그리기
+		for (int i = 0; i < game->card_list.size(); i++)
+		{
+
+			ltSize = D2D1::Point2F(game->card_list[i]->x, game->card_list[i]->y);
+			rect = D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + (0.8f * CARD_WIDTH), ltSize.y + (0.8f * CARD_HEIGHT));
+
+
+			if (SUCCEEDED(hr))
+			{
+				for (int j = 0; j < game->card_list[i]->card_vec.size(); j++)
+				{
+					SpiderCard* card = game->card_list[i]->card_vec[j];
+
+					if (card->bShow)
+					{
+						hr = LoadBitmapFromFile(game->GetCardImage(game->card_list[i]->card_vec[j]).c_str(), &bitmap);
+					}
+					else
+					{
+						hr = LoadBitmapFromFile(L"image\\card\\back.png", &bitmap);
+					}
+
+					m_pRenderTarget->DrawBitmap(
+						bitmap,
+						rect,
+						1.f
+					);
+
+					rect.top += 18.5f;
+					rect.bottom += 18.5f;
+				}
+			}
+		}
+
+		//오픈 된 카드 전체에 테두리
+		if (game->select_index >= 0 && game->select_index_2 >= 0)
+		{
+			ltSize = D2D1::Point2F(game->card_list[game->select_index]->x, game->card_list[game->select_index]->y);
+			rect = D2D1::RectF(ltSize.x, ltSize.y + (18.5f * game->select_index_2), ltSize.x + (0.8f * CARD_WIDTH), ltSize.y + (18.5f * (game->card_list[game->select_index]->card_vec.size() - 1)) + (0.8f * CARD_HEIGHT));
+
+			m_pRenderTarget->DrawRectangle(rect, m_pYellowBrush, 2.5f);
+		}
+
+		//무덤 그리기
+		for (int i = 0; i < game->grave_cnt; i++)
+		{
+			ltSize = D2D1::Point2F(875.f, 550.f + (i * 10));
+			rect = D2D1::RectF(ltSize.x, ltSize.y, ltSize.x + (0.8f * CARD_WIDTH), ltSize.y + (0.8f * CARD_HEIGHT));
+
+			hr = LoadBitmapFromFile(L"image\\card\\back.png", &bitmap);
+
+			if (SUCCEEDED(hr))
+			{
+				m_pRenderTarget->DrawBitmap(
+					bitmap,
+					rect,
+					1.f
+				);
+			}
+		}
+
+
+		hr = m_pRenderTarget->EndDraw();
+	}
+
+	if (hr == D2DERR_RECREATE_TARGET)
+	{
+		hr = S_OK;
+		DiscardDeviceResources();
+	}
 }
 
 VOID GraphicClass::OnYutGameInit(HWND hWnd, BOOL bGameEnd, YutGameClass* game)
@@ -196,16 +310,10 @@ VOID GraphicClass::OnYutGameInit(HWND hWnd, BOOL bGameEnd, YutGameClass* game)
 		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat_2, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
 
 		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 241.5f, 400.f);
-		if (game->player_turn)
-		{
-			text = L"적의 차례입니다.";
-			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
-		}
-		else
-		{
-			text = L"나의 차례입니다.";
-			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
-		}
+		text = game->system_message;
+
+		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
+
 
 		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 241.5f, 650.f);
 

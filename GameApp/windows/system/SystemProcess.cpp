@@ -4,6 +4,7 @@
 #include "system/SystemClass.h"
 #include "card/CardGameClass.h"
 #include "omok/OmokGameClass.h"
+#include "spider/SpiderGameClass.h"
 
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
@@ -77,6 +78,11 @@ VOID SystemClass::CommandHandler(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM
 			m_stageCnt = OMOK_GAME;
 			m_Game = new OmokGameClass(2);
 			CreateButtons(hWnd);
+			InvalidateRect(hWnd, nullptr, TRUE);
+			break;
+		case IDC_GAME_SPIDER:
+			m_stageCnt = SPIDER_GAME;
+			m_Game = new SpiderGameClass(1);
 			InvalidateRect(hWnd, nullptr, TRUE);
 			break;
 	}

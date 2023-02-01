@@ -53,7 +53,7 @@ VOID OmokGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 			}
 		}
 
-		if (index >= 0)
+		if (index >= 0 && pos_list[index]->bClick == CLICK_NONE)
 		{
 			pos_list[index]->bClick = CLICK_BLACK;
 
