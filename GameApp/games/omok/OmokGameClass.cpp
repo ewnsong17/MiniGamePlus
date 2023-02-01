@@ -87,17 +87,11 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 	//우선순위
 
 	int index = -1;
+	int priority = 7;
 	std::set<int> index_list;
 
 	for (int i = 0; i < pos_list.size(); i++)
 	{
-		//놓을 위치 찾았으면 그만 하기.
-		if (index >= 0)
-		{
-			break;
-		}
-
-
 		//가로 검색
 		int x_ = i + 84;
 		if (pos_list.size() > x_ && pos_list[i]->x <= 610.f)
@@ -123,45 +117,130 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 								{
 									if (pos_list[(long long)i - 21]->bClick == CLICK_NONE)
 									{
-										index = i - 21;
-										break;
+										if (priority > (turn == player_turn ? 1 : 2))
+										{
+											priority = (turn == player_turn ? 1 : 2);
+											index = i - 21;
+											break;
+										}
 									}
 								}
 
 								if (pos_list[(long long)i + 84]->bClick == CLICK_NONE)
 								{
-									index = i + 84;
-									break;
+									if (priority > (turn == player_turn ? 1 : 2))
+									{
+										priority = (turn == player_turn ? 1 : 2);
+										index = i + 84;
+										break;
+									}
 								}
 							}
-							else if (pos_list[(long long)i + 63]->bClick == CLICK_NONE)
+							else
 							{
-								//3. 내 양쪽 안막힌 3개를 잇는다.
-								//4. 내 한쪽 안막힌 3개를 잇는다.
-								//5. 상대 양쪽 안막힌 3개를 막는다.
-								//6. 상대 한쪽 안막힌 3개를 막는다.
+								//나 : ■, 상대 : ㅁ
 
-								index = i + 63;
-								break;
+								if (i - 21 >= 0)
+								{
+									INT left_turn = pos_list[(long long)i - 21]->bClick;
+									INT right_turn = pos_list[(long long)i + 63]->bClick;
+
+									if (turn != player_turn)
+									{
+										if (left_turn == CLICK_NONE && right_turn == CLICK_NONE)
+										{
+											//3. 상대 양쪽 안막힌 3개를 막는다.
+											// ㅁ -> xㅁㅁㅁx
+											if (priority > 3)
+											{
+												priority = 3;
+												index = i + 63;
+												break;
+											}
+										}
+										else if (left_turn == CLICK_NONE && right_turn != CLICK_NONE)
+										{
+											//4. 상대 한쪽 안막힌 3개를 막는다.
+											// ㅁ -> xㅁㅁㅁ■
+											if (priority > 4)
+											{
+												priority = 4;
+												index = i - 21;
+												break;
+											}
+										}
+										else if (left_turn == player_turn && right_turn == CLICK_NONE)
+										{
+											//4. 상대 한쪽 안막힌 3개를 막는다.
+											// ㅁ -> ■ㅁㅁㅁx
+											if (priority > 4)
+											{
+												priority = 4;
+												index = i + 63;
+												break;
+											}
+										}
+									}
+									else
+									{
+										if (left_turn == CLICK_NONE && right_turn == CLICK_NONE)
+										{
+											//5. 내 양쪽 안막힌 3개를 잇는다.
+											// ■ -> x■■■x
+											if (priority > 5)
+											{
+												priority = 5;
+												index = i - 21;
+												break;
+											}
+										}
+										else if (left_turn == CLICK_NONE && right_turn != CLICK_NONE)
+										{
+											//6. 내 한쪽 안막힌 3개를 잇는다.
+											// ■ -> x■■■ㅁ
+											if (priority > 6)
+											{
+												priority = 6;
+												index = i - 21;
+												break;
+											}
+										}
+										else if (left_turn == player_turn && right_turn == CLICK_NONE)
+										{
+											//6. 내 한쪽 안막힌 3개를 잇는다.
+											// ■ -> ㅁ■■■x
+											if (priority > 6)
+											{
+												priority = 6;
+												index = i + 63;
+												break;
+											}
+										}
+									}
+								}
 							}
 						}
 						else if (turn == player_turn && pos_list[(long long)i + 42]->bClick == CLICK_NONE)
 						{
-							//7. 내 양쪽 안막힌 2개를 잇는다.
-							index = i + 42;
-							break;
+							//5. 내 양쪽 안막힌 2개를 잇는다.
+							if (priority > 5)
+							{
+								priority = 5;
+								index = i + 42;
+								break;
+							}
 						}
 					}
 					else if (turn == player_turn && pos_list[(long long)i + 21]->bClick == CLICK_NONE)
 					{
-						//8. 내 돌 옆에 잇는다.
-						index_list.insert(i + 21);
+						//6. 내 돌 옆에 잇는다.
+						if (priority >= 6)
+						{
+							priority = 6;
+							index_list.insert(i + 21);
+							break;
+						}
 					}
-				}
-
-				if (turn == player_turn && index >= 0)
-				{
-					break;
 				}
 			}
 		}
@@ -185,38 +264,80 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 								{
 									if (pos_list[(long long)i - 1]->bClick == CLICK_NONE)
 									{
-										index = i - 1;
-										break;
+										if (priority > (turn == player_turn ? 1 : 2))
+										{
+											priority = (turn == player_turn ? 1 : 2);
+											index = i - 1;
+											break;
+										}
 									}
 								}
 
 								if (pos_list[(long long)i + 4]->bClick == CLICK_NONE)
 								{
-									index = i + 4;
-									break;
+									if (priority > (turn == player_turn ? 1 : 2))
+									{
+										priority = (turn == player_turn ? 1 : 2);
+										index = i + 4;
+										break;
+									}
 								}
 							}
-							else if (pos_list[(long long)i + 3]->bClick == CLICK_NONE)
+							else
 							{
-								index = i + 3;
-								break;
+								if (i - 1 >= 0)
+								{
+									if (pos_list[(long long)i - 1]->bClick == CLICK_NONE)
+									{
+										if (priority > (turn == player_turn ? 4 : 3))
+										{
+											priority = (turn == player_turn ? 4 : 3);
+											index = i - 1;
+											break;
+										}
+									}
+								}
+
+								if (turn != player_turn && pos_list[(long long)i + 3]->bClick == CLICK_NONE)
+								{
+									if (priority > 3)
+									{
+										priority = 3;
+										index = i + 3;
+										break;
+									}
+								}
+								else if (turn == player_turn && pos_list[(long long)i + 3]->bClick == CLICK_NONE)
+								{
+
+									if (priority > 4)
+									{
+										priority = 4;
+										index = i + 3;
+										break;
+									}
+								}
 							}
 						}
 						else if (turn == player_turn && pos_list[(long long)i + 2]->bClick == CLICK_NONE)
 						{
-							index = i + 2;
-							break;
+							if (priority > 5)
+							{
+								priority = 5;
+								index = i + 2;
+								break;
+							}
 						}
 					}
 					else if (pos_list[(long long)i + 1]->bClick == CLICK_NONE)
 					{
-						index_list.insert(i + 1);
+						if (priority >= 6)
+						{
+							priority = 6;
+							index_list.insert(i + 1);
+							break;
+						}
 					}
-				}
-
-				if (turn == player_turn && index >= 0)
-				{
-					break;
 				}
 			}
 		}
@@ -239,38 +360,80 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 								{
 									if (pos_list[(long long)i - 22]->bClick == CLICK_NONE)
 									{
-										index = i - 22;
-										break;
+										if (priority > (turn == player_turn ? 1 : 2))
+										{
+											priority = (turn == player_turn ? 1 : 2);
+											index = i - 22;
+											break;
+										}
 									}
 								}
 
 								if (pos_list[(long long)i + 88]->bClick == CLICK_NONE)
 								{
-									index = i + 88;
-									break;
+									if (priority > (turn == player_turn ? 1 : 2))
+									{
+										priority = (turn == player_turn ? 1 : 2);
+										index = i + 88;
+										break;
+									}
 								}
 							}
-							else if (pos_list[(long long)i + 66]->bClick == CLICK_NONE)
+							else
 							{
-								index = i + 66;
-								break;
+								if (i - 22 >= 0)
+								{
+									if (pos_list[(long long)i - 22]->bClick == CLICK_NONE)
+									{
+										if (priority > (turn == player_turn ? 4 : 3))
+										{
+											priority = (turn == player_turn ? 4 : 3);
+											index = i - 22;
+											break;
+										}
+									}
+								}
+
+								if (turn != player_turn && pos_list[(long long)i + 66]->bClick == CLICK_NONE)
+								{
+									if (priority > 3)
+									{
+										priority = 3;
+										index = i + 66;
+										break;
+									}
+								}
+								else if (turn == player_turn && pos_list[(long long)i + 66]->bClick == CLICK_NONE)
+								{
+
+									if (priority > 4)
+									{
+										priority = 4;
+										index = i + 66;
+										break;
+									}
+								}
 							}
 						}
 						else if (turn == player_turn && pos_list[(long long)i + 44]->bClick == CLICK_NONE)
 						{
-							index = i + 44;
-							break;
+							if (priority > 5)
+							{
+								priority = 5;
+								index = i + 44;
+								break;
+							}
 						}
 					}
 					else if (pos_list[(long long)i + 22]->bClick == CLICK_NONE)
 					{
-						index_list.insert(i + 22);
+						if (priority >= 6)
+						{
+							priority = 6;
+							index_list.insert(i + 22);
+							break;
+						}
 					}
-				}
-
-				if (turn == player_turn && index >= 0)
-				{
-					break;
 				}
 			}
 		}
@@ -288,42 +451,80 @@ VOID OmokGameClass::TurnCPU(HWND hWnd)
 					{
 						if (pos_list[(long long)i - 40]->bClick == turn)
 						{
-
 							if (pos_list[(long long)i - 60]->bClick == turn)
 							{
 								if (pos_list[(long long)i + 20]->bClick == CLICK_NONE)
 								{
-									index = i + 20;
-									break;
+									if (priority > (turn == player_turn ? 1 : 2))
+									{
+										priority = (turn == player_turn ? 1 : 2);
+										index = i + 20;
+										break;
+									}
 								}
 
 								if (pos_list[(long long)i - 80]->bClick == CLICK_NONE)
 								{
-									index = i - 80;
-									break;
+									if (priority > (turn == player_turn ? 1 : 2))
+									{
+										priority = (turn == player_turn ? 1 : 2);
+										index = i - 80;
+										break;
+									}
 								}
 							}
-							else if (pos_list[(long long)i - 60]->bClick == CLICK_NONE)
+							else
 							{
-								index = i - 60;
-								break;
+								if (pos_list[(long long)i + 20]->bClick == CLICK_NONE)
+								{
+									if (priority > (turn == player_turn ? 4 : 3))
+									{
+										priority = (turn == player_turn ? 4 : 3);
+										index = i + 20;
+										break;
+									}
+								}
+
+								if (turn != player_turn && pos_list[(long long)i - 60]->bClick == CLICK_NONE)
+								{
+									if (priority > 3)
+									{
+										priority = 3;
+										index = i - 60;
+										break;
+									}
+								}
+								else if (turn == player_turn && pos_list[(long long)i - 60]->bClick == CLICK_NONE)
+								{
+
+									if (priority > 4)
+									{
+										priority = 4;
+										index = i - 60;
+										break;
+									}
+								}
 							}
 						}
 						else if (turn == player_turn && pos_list[(long long)i - 40]->bClick == CLICK_NONE)
 						{
-							index = i - 40;
-							break;
+							if (priority > 5)
+							{
+								priority = 5;
+								index = i - 40;
+								break;
+							}
 						}
 					}
 					else if (pos_list[(long long)i - 20]->bClick == CLICK_NONE)
 					{
-						index_list.insert(i - 20);
+						if (priority >= 6)
+						{
+							priority = 6;
+							index_list.insert(i - 20);
+							break;
+						}
 					}
-				}
-
-				if (turn == player_turn && index >= 0)
-				{
-					break;
 				}
 			}
 		}
