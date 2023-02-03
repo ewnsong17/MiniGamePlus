@@ -31,6 +31,8 @@ class SpiderGameClass : public IGame
 public:
 	SpiderGameClass(UINT player_size);
 
+	~SpiderGameClass();
+
 	std::wstring GetCardImage(SpiderCard* card);
 
 	VOID MoveCard(SpiderCardList* moveTo);

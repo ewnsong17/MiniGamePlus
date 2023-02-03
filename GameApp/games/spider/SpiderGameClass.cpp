@@ -40,6 +40,30 @@ SpiderGameClass::SpiderGameClass(UINT player_size)
 	player_turn = 0;
 }
 
+SpiderGameClass::~SpiderGameClass()
+{
+	for (int i = 0; i < card_list.size(); i++)
+	{
+		for (auto iter = card_list[i]->card_vec.begin(); iter != card_list[i]->card_vec.end(); iter++)
+		{
+			delete *iter;
+		}
+
+		card_list[i]->card_vec.clear();
+
+		delete card_list[i];
+	}
+
+	card_list.clear();
+
+	for (int i = 0; i < card_grave_list.size(); i++)
+	{
+		delete card_grave_list[i];
+	}
+
+	card_grave_list.clear();
+}
+
 std::wstring SpiderGameClass::GetCardImage(SpiderCard* card)
 {
 	std::wstring num_str;
@@ -94,6 +118,11 @@ VOID SpiderGameClass::CompleteSet()
 
 		if (last_card == 1)
 		{
+			for (auto iter = card_vec->end() - 13; iter != card_vec->end(); iter++)
+			{
+				delete *iter;
+			}
+
 			card_vec->resize(card_vec->size() - 13);
 		}
 	}

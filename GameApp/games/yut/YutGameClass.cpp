@@ -34,6 +34,16 @@ YutGameClass::YutGameClass(UINT player_size)
 	CreateThread(nullptr, 0, SystemClass::GameMainThread, &threadParam, 0, &threadId);
 }
 
+YutGameClass::~YutGameClass()
+{
+	for (int i = 0; i < yut_player_vec.size(); i++)
+	{
+		delete yut_player_vec[i];
+	}
+
+	yut_player_vec.clear();
+}
+
 VOID YutGameClass::ThrowYut(HWND hWnd)
 {
 	UINT rand_;

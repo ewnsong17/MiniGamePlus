@@ -371,7 +371,19 @@ VOID SystemClass::Shutdown()
 	if (m_Input)
 	{
 		delete m_Input;
-		m_Input = 0;
+		m_Input = nullptr;
+	}
+
+	if (m_Graphic)
+	{
+		delete m_Graphic;
+		m_Graphic = nullptr;
+	}
+
+	if (m_Game)
+	{
+		delete m_Game;
+		m_Game = nullptr;
 	}
 
 	ShutdownWindows();

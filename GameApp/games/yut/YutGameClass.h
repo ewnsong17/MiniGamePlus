@@ -32,6 +32,8 @@ public:
 
 	YutGameClass(UINT player_size);
 
+	~YutGameClass();
+
 	VOID ThrowYut(HWND hWnd);
 
 	VOID SetPlayerYutMoveList(HWND hWnd);

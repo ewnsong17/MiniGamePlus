@@ -40,6 +40,22 @@ CardGameClass::CardGameClass(UINT player_size)
 	CreateThread(nullptr, 0, SystemClass::GameMainThread, &threadParam, 0, &threadId);
 }
 
+CardGameClass::~CardGameClass()
+{
+	for (auto iter = card_list.begin(); iter != card_list.end(); iter++)
+	{
+		delete *iter;
+	}
+
+	if (FAKE_CARD)
+	{
+		delete FAKE_CARD;
+		FAKE_CARD = nullptr;
+	}
+
+	card_list.clear();
+}
+
 Card* CardGameClass::GetNextCard()
 {
 	if (FAKE_CARD != nullptr)
@@ -416,6 +432,7 @@ VOID CardGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 				//페이크 카드 지우기
 				if (FAKE_CARD != nullptr)
 				{
+					delete FAKE_CARD;
 					FAKE_CARD = nullptr;
 				}
 

@@ -17,6 +17,8 @@ class OmokGameClass : public IGame
 public:
 	OmokGameClass(UINT player_size);
 
+	~OmokGameClass();
+
 	virtual VOID GetMouseClick(HWND hWnd, INT xPos, INT yPos);
 
 	virtual VOID TurnCPU(HWND hWnd);

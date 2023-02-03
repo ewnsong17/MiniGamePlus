@@ -34,6 +34,16 @@ OmokGameClass::OmokGameClass(UINT player_size)
 	CreateThread(nullptr, 0, SystemClass::GameMainThread, &threadParam, 0, &threadId);
 }
 
+OmokGameClass::~OmokGameClass()
+{
+	for (auto iter = pos_list.begin(); iter != pos_list.end(); iter++)
+	{
+		delete *iter;
+	}
+
+	pos_list.clear();
+}
+
 VOID OmokGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 {
 	if (player_turn == 0 && timer > 0)

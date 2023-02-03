@@ -1,1 +1,2 @@
 C:\Users\R0720H\Desktop\Etc\Git\MiniGamePlus\GameApp\x64\Debug\GameApp.exe
+D:\MiniGamePlus\GameApp\x64\Debug\GameApp.exe

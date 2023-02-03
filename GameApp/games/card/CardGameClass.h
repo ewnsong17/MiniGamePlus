@@ -39,6 +39,8 @@ public:
 
 	CardGameClass(UINT player_size);
 
+	~CardGameClass();
+
 	Card* GetNextCard();
 
 	VOID GetCardFromGraves(int ownerID);
