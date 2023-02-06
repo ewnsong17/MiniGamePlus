@@ -10,9 +10,9 @@ GraphicClass::GraphicClass() :
 	m_pYellowBrush(nullptr),
 	m_pCornflowerBlueBrush(nullptr),
 	m_pIWICFactory(nullptr),
-	m_pDWriteFactory(nullptr),
 	m_pTextFormat(nullptr),
-	m_pTextFormat_2(nullptr)
+	m_pTextFormat_2(nullptr),
+	m_pDWriteFactory(nullptr)
 {}
 
 GraphicClass::~GraphicClass()
@@ -23,10 +23,10 @@ GraphicClass::~GraphicClass()
 	SafeRelease(m_pBlackBrush);
 	SafeRelease(m_pYellowBrush);
 	SafeRelease(m_pCornflowerBlueBrush);
-	SafeRelease(m_pIWICFactory);
-	SafeRelease(m_pDWriteFactory);
+//	SafeRelease(m_pIWICFactory);
 	SafeRelease(m_pTextFormat);
 	SafeRelease(m_pTextFormat_2);
+	SafeRelease(m_pDWriteFactory);
 }
 
 
