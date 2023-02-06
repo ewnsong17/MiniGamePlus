@@ -227,20 +227,27 @@ VOID SpiderGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 				}
 			}
 
-			int check_num = -1;
-
-			for (int j = index_2; j < card_vec.size(); j++)
+			if (index_2 >= 0)
 			{
-				if (check_num == -1)
-				{
-					check_num = card_vec[j]->number;
-				}
-				else if (check_num - card_vec[j]->number != 1)
-				{
-					check_num = -1;
-				}
+				int click_num = card_vec[index_2]->number;
+				int j = index_2;
+				std::cout << "clicked : " << click_num << '\n';
+				std::cout << "click_index : " << index << '\n';
 
-				std::cout << "check : " << check_num << '\n';
+				for (; j < card_vec.size(); j++)
+				{
+					if (click_num == card_vec[j]->number)
+					{
+						click_num--;
+					}
+					else
+					{
+						std::cout << "index diff : " << click_num << " : " << card_vec[j]->number << '\n';
+						std::cout << "index update : " << j << '\n';
+						index_2 = j;
+						click_num = card_vec[j]->number - 1;
+					}
+				}
 			}
 		}
 	}
@@ -273,6 +280,7 @@ VOID SpiderGameClass::GetMouseClick(HWND hWnd, INT xPos, INT yPos)
 
 	std::cout << "index : " << index << '\n';
 	std::cout << "index_2 : " << index_2 << '\n';
+	std::cout << '\n';
 
 	InvalidateRect(hWnd, nullptr, TRUE);
 }
