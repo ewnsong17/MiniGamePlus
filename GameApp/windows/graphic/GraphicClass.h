@@ -52,7 +52,6 @@ private:
 	ID2D1SolidColorBrush* m_pYellowBrush;
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
 
-	IWICImagingFactory* m_pIWICFactory;
 	IDWriteTextFormat* m_pTextFormat;
 	IDWriteTextFormat* m_pTextFormat_2;
 	IDWriteFactory* m_pDWriteFactory;

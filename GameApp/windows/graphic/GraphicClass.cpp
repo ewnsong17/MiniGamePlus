@@ -9,7 +9,6 @@ GraphicClass::GraphicClass() :
 	m_pBlackBrush(nullptr),
 	m_pYellowBrush(nullptr),
 	m_pCornflowerBlueBrush(nullptr),
-	m_pIWICFactory(nullptr),
 	m_pTextFormat(nullptr),
 	m_pTextFormat_2(nullptr),
 	m_pDWriteFactory(nullptr)
@@ -23,7 +22,6 @@ GraphicClass::~GraphicClass()
 	SafeRelease(m_pBlackBrush);
 	SafeRelease(m_pYellowBrush);
 	SafeRelease(m_pCornflowerBlueBrush);
-//	SafeRelease(m_pIWICFactory);
 	SafeRelease(m_pTextFormat);
 	SafeRelease(m_pTextFormat_2);
 	SafeRelease(m_pDWriteFactory);
@@ -733,15 +731,16 @@ VOID GraphicClass::OnResize(UINT width, UINT height)
 
 HRESULT GraphicClass::LoadBitmapFromFile(LPCWSTR uri, ID2D1Bitmap** ppBitmap)
 {
+	IWICImagingFactory* pIWICFactory = nullptr;
 	IWICBitmapDecoder* pDecoder = nullptr;
 	IWICBitmapFrameDecode* pSource = nullptr;
 	IWICFormatConverter* pConverter = nullptr;
 
-	HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<void**>(&m_pIWICFactory));
+	HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<void**>(&pIWICFactory));
 
 	if (SUCCEEDED(hr))
 	{
-		hr = m_pIWICFactory->CreateDecoderFromFilename(uri, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
+		hr = pIWICFactory->CreateDecoderFromFilename(uri, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
 	}
 
 	if (SUCCEEDED(hr))
@@ -751,7 +750,7 @@ HRESULT GraphicClass::LoadBitmapFromFile(LPCWSTR uri, ID2D1Bitmap** ppBitmap)
 
 	if (SUCCEEDED(hr))
 	{
-		hr = m_pIWICFactory->CreateFormatConverter(&pConverter);
+		hr = pIWICFactory->CreateFormatConverter(&pConverter);
 	}
 
 	if (SUCCEEDED(hr))
@@ -774,6 +773,7 @@ HRESULT GraphicClass::LoadBitmapFromFile(LPCWSTR uri, ID2D1Bitmap** ppBitmap)
 	SafeRelease(pDecoder);
 	SafeRelease(pSource);
 	SafeRelease(pConverter);
+	SafeRelease(pIWICFactory);
 
 	return hr;
 }
