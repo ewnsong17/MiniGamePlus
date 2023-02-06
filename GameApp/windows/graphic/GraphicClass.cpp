@@ -302,8 +302,11 @@ VOID GraphicClass::OnYutGameInit(HWND hWnd, BOOL bGameEnd, YutGameClass* game)
 		m_pRenderTarget->DrawEllipse(ellipse, m_pBlackBrush, 3.5f);
 
 		//±Û¾¾ ±×¸®±â
-		rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 241.5f, 200.f);
-		text = std::to_wstring(game->timer);
+		if (game->timer >= 0)
+		{
+			rtSize = D2D1::SizeF(SCREEN_WIDTH * 2 - 241.5f, 200.f);
+			text = std::to_wstring(game->timer);
+		}
 
 		m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat_2, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
 
@@ -418,8 +421,10 @@ VOID GraphicClass::OnOmokGameInit(HWND hWnd, BOOL bGameEnd, OmokGameClass* game)
 		}
 		else
 		{
-
-			text = std::to_wstring(game->timer);
+			if (game->timer >= 0)
+			{
+				text = std::to_wstring(game->timer);
+			}
 
 			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat_2, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
 
@@ -636,8 +641,11 @@ VOID GraphicClass::OnCardGameInit(HWND hWnd, BOOL bGameEnd, CardGameClass* game)
 
 		if (!bGameEnd)
 		{
-			rtSize = D2D1::SizeF(SCREEN_WIDTH - 20.f, 430.f);
-			text = std::to_wstring(game->timer);
+			if (game->timer >= 0)
+			{
+				rtSize = D2D1::SizeF(SCREEN_WIDTH - 20.f, 430.f);
+				text = std::to_wstring(game->timer);
+			}
 
 			m_pRenderTarget->DrawTextW(text.c_str(), wcslen(text.c_str()), m_pTextFormat, D2D1::RectF(0, 0, rtSize.width, rtSize.height), m_pCornSlikBrush);
 		}
