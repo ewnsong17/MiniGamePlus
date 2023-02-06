@@ -102,6 +102,7 @@ VOID SpiderGameClass::CompleteSet()
 
 		INT last_card = 14;
 
+		//카드별로 K-A까지 세트순으로 있는지 정렬
 		for (int j = 0; j < card_vec->size(); j++)
 		{
 			if (last_card - card_vec->at(j)->number == 1)
@@ -124,6 +125,12 @@ VOID SpiderGameClass::CompleteSet()
 			}
 
 			card_vec->resize(card_vec->size() - 13);
+
+			//마지막이 된 카드를 Show되게 변경
+			if (card_vec->size() > 0)
+			{
+				card_vec->at(card_vec->size() - 1)->bShow = TRUE;
+			}
 		}
 	}
 }
